@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>CodePen - click three.js</title>
+
+    <link rel="stylesheet" href="css/style.css" media="screen" type="text/css" />
+
+</head>
+
+<body>
+
+  <div class="object-menu"></div>
+
+  <div class="add_menu">
+  <div class="inner">
+    <div id="box" class="item" data-type="box">Box</div>
+    <div id="schrank" class="item" data-type="schrank">Schrank</div>
+  </div>
+  <div class="options">
+  <input type="text" placeholder="typ"/>
+    <form>
+      <select name="top5">
+        <option>Box</option>
+        <option>Schrank</option>
+        <option>Sessel</option>
+        <option>Stuhl</option>
+        <option>Arbeitsplatz</option>
+      </select>
+    </form>
+    <form>
+    <label for="pos-x">X</label>
+    <input type="range" min="-100" max="100" val="0"/><label for="pos-y">Y</label>
+    <input type="range" min="-100" max="100" val="0"/><label for="pos-z">Z</label>
+    <input type="range" min="-100" max="100" val="0"/>
+    </form>
+    <div id="export" class="item" data-type="export">Export</div>
+    </div>
+</div>
+
+
+
+<svg  width="595.28px" height="594px" viewBox="0 0 595.28 594">
+<g>
+ <path class="st0" d="M333.5,247.9h-20v-51.8h-51.8v-20h51.8v-51.8h20v51.8h51.8v20h-51.8V247.9z M314.5,246.9h18v-51.8h51.8v-181h-51.8v-51.8h-18v51.8h-51.8v18h51.8V246.9z"/>
+<path class="st0" d="M431.2,522.9h-20v-51.8h-51.8v-20h51.8v-51.8h20v51.8H483v20h-51.8V522.9z M412.1,521.9h18v-51.8H482v-18h-51.8v-51.8h-18v51.8h-51.8v18h51.8V521.9z"/>
+<path class="st0" d="M210.8,609.9h-20v-51.8H139v-20h51.8v-51.8h20v51.8h51.8v20h-51.8V609.9z M191.8,608.9h18v-51.8h51.8v-18h-51.8v-51.8h-18v51.8H140v18h51.8V608.9z"/>
+<path class="st0" d="M19.3,164.6H4V4.3h15.3V164.6z M5,163.6h13.3V5.3H5V163.6z"/>
+<path class="st0" d="M19.3,339.6H4V179.3h15.3V339.6z M5,338.6h13.3V180.3H5V338.6z"/>
+<path class="st0" d="M19.3,514.6H4V354.3h15.3V514.6z M5,513.6h13.3V355.3H5V513.6z"/>
+<path class="st0" d="M19.3,689.6H4V529.3h15.3V689.6z M5,688.6h13.3V530.3H5V688.6z"/>
+<path class="st0" d="M589.9,164.6h-15.3V4.3h15.3V164.6z M575.6,163.6h13.3V5.3h-13.3V163.6z"/>
+<path class="st0" d="M589.9,339.6h-15.3V179.3h15.3V339.6z M575.6,338.6h13.3V180.3h-13.3V338.6z"/>
+<path class="st0" d="M589.9,514.6h-15.3V354.3h15.3V514.6z M575.6,513.6h13.3V355.3h-13.3V513.6z"/>
+<path class="st0" d="M589.9,689.6h-15.3V529.3h15.3V689.6z M575.6,688.6h13.3V530.3h-13.3V688.6z"/>
+<path class="st0" d="M153,689.6H24.9v-15.3H153V689.6z M25.9,688.6H152v-13.3H25.9V688.6z"/>
+<path class="st0" d="M292.5,689.6H164.5v-15.3h128.1V689.6z M165.5,688.6h126.1v-13.3H165.5V688.6z"/>
+<path class="st0" d="M432.1,689.6H304v-15.3h128.1V689.6z M305,688.6h126.1v-13.3H305V688.6z"/>
+<path class="st0" d="M571.6,689.6H443.6v-15.3h128.1V689.6z M444.6,688.6h126.1v-13.3H444.6V688.6z"/>
+<path class="st0" d="M153,23.5H24.9V8.2H153V23.5z M25.9,22.5H152V9.2H25.9V22.5z"/>
+<path class="st0" d="M292.5,23.5H164.5V8.2h128.1V23.5z M165.5,22.5h126.1V9.2H165.5V22.5z"/>
+<path class="st0" d="M432.1,23.5H304V8.2h128.1V23.5z M305,22.5h126.1V9.2H305V22.5z"/>
+<path class="st0" d="M571.6,23.5H443.6V8.2h128.1V23.5z M444.6,22.5h126.1V9.2H444.6V22.5z"/>
+<path class="st0" d="M165.5,184.8h-52v-47.4h52V184.8z M114.5,183.8h50v-45.4h-50V183.8z"/>
+<path class="st0" d="M165.5,242h-52v-47.4h52V242z M114.5,241h50v-45.4h-50V241z"/>
+<path class="st0" d="M266.7,358.6h-52v-47.4h52V358.6z M215.7,357.6h50v-45.4h-50V357.6z"/>
+<path class="st0" d="M266.7,415.8h-52v-47.4h52V415.8z M215.7,414.8h50v-45.4h-50V414.8z"/>
+</g>
+</svg>
+
+
+
+
+  <script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
+  <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/61062/requestAnimationFrame.js'></script>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js'></script>
+  <script src='http://paprcraft.com/js/orbit_controls.js'></script>
+  <script src='js/d3-three.js'></script>
+  <script src="js/index.js"></script>
+
+</body>
+
+</html>
