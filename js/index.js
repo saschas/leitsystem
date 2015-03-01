@@ -34,18 +34,14 @@ var object_options = {
   extra : {
     href : 'http://www.google.de/',
     description : 'Dieser Gegenstand hat eine Beschreibung',
-
   }
 }
-
 
 ///////////////////////////////////////
 /// Fire
 ///////////////////////////////////////
 init();
 animate();
-
-
 
 ///////////////////////////////////////
 ////  Init
@@ -255,17 +251,14 @@ $(".st0").each(function(){
   // add it to the scene.
   grundriss_holder.add(shape);
 });
-grundriss_holder.scale.set(1,1,20);
+grundriss_holder.scale.set(2,2,20);
 grundriss_holder.rotation.x = 90*Math.PI/180;
 grundriss_holder.position.y = 50;
-grundriss_holder.position.x = 300;
-
+grundriss_holder.position.x = 600;
+grundriss_holder.position.z = -600;
 scene.add(grundriss_holder);
 
 //shape.position.y = 50;
-
-
-
 
 //////////////////////////////////////////////////
  // Menu
@@ -283,7 +276,7 @@ $('.item').click(function(){
   }
 
   if(type=='export'){
-    console.log('All Objects',objects);
+    console.log('All Objects = objects',objects);
   }
   else{
     add_new_Object(object_options);
@@ -424,6 +417,10 @@ function render() {
   controls.update();
   renderer.render( scene, camera );
 }
+
+
+
+
 
 /*
 var objects = [], plane;
