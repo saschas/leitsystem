@@ -28,3 +28,14 @@ var object_options = {
 
 
 ####SVG Import (Grundriss)
+
+
+#### Todo
+- Object Menu
+  + Rotate
+  + Link
+  + Type
+  + Clone
+    * Fläche markieren und
+
+

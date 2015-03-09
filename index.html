@@ -5,7 +5,7 @@
 
   <meta charset="UTF-8">
 
-  <title>CodePen - click three.js</title>
+  <title>Leitsystem — Three.js</title>
 
     <link rel="stylesheet" href="css/style.css" media="screen" type="text/css" />
 
@@ -13,33 +13,7 @@
 
 <body>
 
-  <div class="object-menu"></div>
 
-  <div class="add_menu">
-  <div class="inner">
-    <div id="box" class="item" data-type="box">Box</div>
-    <div id="schrank" class="item" data-type="schrank">Schrank</div>
-  </div>
-  <div class="options">
-  <input type="text" placeholder="typ"/>
-    <form>
-      <select name="top5">
-        <option>Box</option>
-        <option>Schrank</option>
-        <option>Sessel</option>
-        <option>Stuhl</option>
-        <option>Arbeitsplatz</option>
-      </select>
-    </form>
-    <form>
-    <label for="pos-x">X</label>
-    <input type="range" min="-100" max="100" val="0"/><label for="pos-y">Y</label>
-    <input type="range" min="-100" max="100" val="0"/><label for="pos-z">Z</label>
-    <input type="range" min="-100" max="100" val="0"/>
-    </form>
-    <div id="export" class="item" data-type="export">Export</div>
-    </div>
-</div>
 
 
 
@@ -78,9 +52,104 @@
   <script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/61062/requestAnimationFrame.js'></script>
   <script src='http://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js'></script>
   <script src='http://paprcraft.com/js/orbit_controls.js'></script>
+  <script src='http://cdn.rawgit.com/mrdoob/three.js/master/examples/js/exporters/SceneExporter.js'></script>
+  <script src='http://cdn.rawgit.com/josdirksen/learning-threejs/master/libs/SceneLoader.js'></script>
   <script src='js/d3-three.js'></script>
-  <script src="js/index.js"></script>
+  <script src='js/dat.gui.min.js'></script>
 
+  <script src="js/min/main-min.js"></script>
+<style type="text/css">
+  .dg.main.taller-than-window .close-button {
+    border-top: 1px solid #ddd;
+}
+
+.dg.main .close-button {
+    background-color: #ccc;
+}
+ 
+.dg.main .close-button:hover {
+    background-color: #ddd;
+}
+
+.dg {
+    color: #555;
+    text-shadow: none !important;
+}
+.dg.ac {
+  z-index: 9999!important;
+  min-height: 100%;
+  transition-duration:.15s;
+    width: 260px;
+  left: inherit;
+  position: absolute;
+}
+.dg.ac.active{
+  min-height:0;
+}
+
+.dg.main::-webkit-scrollbar {
+    background: #fafafa;
+}
+
+.dg.main::-webkit-scrollbar-thumb {
+    background: #bbb;
+}
+ 
+.dg li:not(.folder) {
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
+}
+ 
+.dg li.save-row .button {
+    text-shadow: none !important;
+}
+
+.dg li.title {
+    background: #e8e8e8 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+}
+
+.dg .cr.function:hover,.dg .cr.boolean:hover {
+    background: #fff;
+}
+ 
+.dg .c input[type=text] {
+    background: #e9e9e9;
+}
+ 
+.dg .c input[type=text]:hover {
+    background: #eee;
+}
+ 
+.dg .c input[type=text]:focus {
+    background: #eee;
+    color: #555;
+}
+ .dg .cr.string input[type=text] {
+  color: #4D4D4D;
+}
+.dg .cr.function {
+  background: #6AD123;
+  color: #fff;
+  text-align: center;
+}
+.dg .cr.function:hover, .dg .cr.boolean:hover{
+    background:#5DB421;
+  }
+.dg .cr.function span{
+  width:100%;
+}
+.dg .c .slider {
+    background: #e9e9e9;
+}
+.dg.main.a {
+  height: 100%;
+  background: rgba(0,0,0,.25);
+}
+
+.dg .c .slider:hover {
+    background: #eee;
+}
+</style>
 </body>
 
 </html>

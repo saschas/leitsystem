@@ -67,14 +67,3 @@ canvas {
   box-shadow: 0 0 2em 0 rgba(0, 0, 0, 0.4); }
   .object-menu.open {
     display: block; }
-
-.options input {
-  width: 82%;
-  padding: 1em;
-  vertical-align: middle; }
-
-label {
-  padding: 0.5em;
-  text-align: left;
-  vertical-align: middle;
-  display: inline-block; }
