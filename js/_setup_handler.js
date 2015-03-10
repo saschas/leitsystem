@@ -38,7 +38,11 @@ function onDocumentMouseMove( event ) {
     SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
     //prevent object from fly
     SELECTED.position.y = 0;
+
     move_Handler(SELECTED);
+    gui_value.x = scene_options.active.position.x;
+    gui_value.z = scene_options.active.position.z;
+    gui_value.rot = scene_options.active.rotation.y;
     return;
   }
 
@@ -46,10 +50,8 @@ function onDocumentMouseMove( event ) {
 
   if ( intersects.length > 0 ) {
     if ( INTERSECTED != intersects[ 0 ].object ) {
-      if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
 
       INTERSECTED = intersects[ 0 ].object;
-      INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
       plane.position.copy( INTERSECTED.position );
       plane.lookAt( camera.position );
@@ -60,9 +62,7 @@ function onDocumentMouseMove( event ) {
 
   } else {
     //reset Mesh to default 
-    if ( INTERSECTED ){
-      INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-    }
+    
     INTERSECTED = null;
     document.body.style.cursor = 'auto';
   }
@@ -83,14 +83,33 @@ function onDocumentMouseDown( event ) {
     controls.enabled = false;
 
     SELECTED = intersects[ 0 ].object;
-
     var intersects = raycaster.intersectObject( plane );
     offset.copy( intersects[ 0 ].point ).sub( plane.position );
-   
-
     
     down_Handler(SELECTED);
-    document.body.style.cursor = 'move';
+    
+    if(!scene_options.active){
+      scene_options.active = SELECTED;
+    }    
+    else if(JSON.stringify(scene_options.active) === JSON.stringify( SELECTED)){
+      scene_options.active.material = basic_material;
+      scene_options.active = null;
+    }
+    else if(JSON.stringify(scene_options.active) != JSON.stringify( SELECTED)){
+      scene_options.active.material = basic_material;
+      scene_options.active = SELECTED;
+    }
+
+    if(scene_options.active){
+      console.log(gui_value.x);
+      gui_value.x = scene_options.active.position.x;
+      gui_value.z = scene_options.active.position.z;
+      gui_value.rot = scene_options.active.rotation.y;
+      gui_value.type = scene_options.active.options.type;
+      gui_value.href = scene_options.active.options.href;
+      gui_value.description = scene_options.active.options.description;
+      document.body.style.cursor = 'move';
+    }
   }
 }
 
@@ -98,13 +117,15 @@ function onDocumentMouseDown( event ) {
     //    Up Setup
 //////////////////////////////////////////
 function onDocumentMouseUp( event ) {
-
+  
   event.preventDefault();
   controls.enabled = true;
   if ( INTERSECTED ) {
     plane.position.copy( INTERSECTED.position );
-    SELECTED = null;
+    
     up_Handler(SELECTED);
+  
   }
+  SELECTED = null;
   document.body.style.cursor = 'auto';
 }

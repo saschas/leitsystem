@@ -1,12 +1,13 @@
 //////////////////////////////////////////////////
 // SVG
 //////////////////////////////////////////////////
+
 var options = {
   amount: 2,
   bevelThickness: 0,
   bevelSize: 0,
   bevelSegments: 0,
-  bevelEnabled: false,
+  bevelEnabled: true,
   curveSegments: 0,
   steps: 1
 };
@@ -19,17 +20,19 @@ function drawShape(el) {
 function createMesh(geom) {
     geom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0));
     // create a multimaterial
-    var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [basic_material]);
-  
+    var mesh = new THREE.Mesh(geom,basic_material);
+    var edges = new THREE.EdgesHelper( mesh, 0x000000 );
+    edges.material.linewidth = 5;
+    scene.add( edges );
     mesh.rotation.z = 90 * Math.PI/180;
-    return mesh;
+    return [mesh];
 }
 
 var grundriss_holder = new THREE.Object3D();
 $(".st0").each(function(){
   shape = createMesh(new THREE.ExtrudeGeometry(drawShape($(this)), options));
   // add it to the scene.
-  grundriss_holder.add(shape);
+  grundriss_holder.add(shape[0]);
 });
   grundriss_holder.scale.set(2,2,50);
   grundriss_holder.rotation.x = 90*Math.PI/180;
