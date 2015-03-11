@@ -1,5 +1,5 @@
 
-var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
+var geometry = new THREE.PlaneGeometry( 900,800, 32 );
 var material = new THREE.MeshBasicMaterial( {
   color: 0xcccccc, 
   side: THREE.DoubleSide, 

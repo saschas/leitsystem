@@ -1,17 +1,21 @@
 var guiOptions = function() {
-  this.message = 'text';
+
+  this.clickable = true;
+  this.lineWidth = 1;
   this.scene = scene;
+
+
+  ///////////////////////////////////////////////////////// 
+  //// Mesh OPTIONs
+  /////////////////////////////////////////////////////////
   this.x = 50;
   this.z = 50;
   this.rot = 0;
-  this.scale = 1;
   this.displayOutline = false;
-  this.href = 'http://www.google.de/';
-  this.description = 'Dieser Gegenstand hat eine Beschreibung';
+  this.href = 'link';
+  this.description = 'Beschreibungstext';
   this.type = 'schrank';
-  //this.position
-  this.clickable = true;
-  this.geometry = '';//new THREE.BoxGeometry(10,10,10);
+
   this.Material = 'MeshLambertMaterial';
 
   this.add = function(){
@@ -31,25 +35,33 @@ var gui = new dat.GUI();
 var gui_value = new guiOptions();
 
 var scene_GUI = gui.addFolder('Scene Options');
-var options_clickable = scene_GUI.add(gui_value, 'clickable');
-var options_scale = scene_GUI.add(gui_value, 'scale',0,10).step(1);
-    scene_GUI.open();
+    scene_GUI.add(gui_value, 'clickable');
+    scene_GUI.add(gui_value,'export');
+    scene_GUI.add(gui_value, 'lineWidth',1,10).listen();
+    for (var i in scene_GUI.__controllers) {
+      scene_GUI.__controllers[i].onChange(function(value) {
+        if(this.property == 'lineWidth'){
 
-
+          grundriss_wire_holder.children.forEach(function(el){
+            el.material.linewidth = value;
+          });
+          edges.material.linewidth = value;
+        }
+      });
+    }
+ 
 
 var mesh_GUI = gui.addFolder('Mesh Options');
+    mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
+    mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
     mesh_GUI.add(gui_value, 'x',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'z',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'rot',0,360).step(45).listen();
-    mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
-    mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
     mesh_GUI.add(gui_value, 'href').listen();
     mesh_GUI.add(gui_value, 'description').listen();
 
     // Add Button
     mesh_GUI.add(gui_value,'add');
-    mesh_GUI.add(gui_value,'export');
-
 
     for (var i in mesh_GUI.__controllers) {
       mesh_GUI.__controllers[i].onChange(function(value) {
@@ -74,26 +86,11 @@ var mesh_GUI = gui.addFolder('Mesh Options');
         }
       });
     }
-
-
-    
-
     mesh_GUI.open();
+
 $('.close-button').click(function(){
   $('.dg.ac').toggleClass('active');
 });
-/*
-
-message.onChange(function(value) {
-  console.log(value);
-  // Fires on every change, drag, keypress, etc.
-});
-
-message.onFinishChange(function(value) {
-  // Fires when a controller loses focus.
- console.log(value);
-});
-*/
 
 $('.dg.ac').bind({
   mouseenter : function(){

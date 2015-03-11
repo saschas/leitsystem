@@ -88,6 +88,55 @@ renderer.domElement.addEventListener("contextmenu", onContextMenu);
 
 window.addEventListener( 'resize', onWindowResize, false );
 
+var meshMaterial = new THREE.MeshLambertMaterial({
+	specular: 0xff0000, 
+	color: 0x444444, 
+	shininess: 0, 
+	metal: true
+});
+
+var basic_material = new THREE.MeshBasicMaterial( { 
+	color: 0xffffff, 
+	opacity:1,
+	shininess: 0,
+	transparent: false 
+} );
+
+var active_material = new THREE.MeshLambertMaterial( { 
+	color: 0xff0000, 
+	opacity:1,
+	shininess: 0,
+	transparent: false 
+} );
+var basic_wire_material = new THREE.MeshBasicMaterial( { 
+	color: 0x000000,
+	wireframe: true, 
+	opacity:1,
+	shininess: 0,
+	transparent: false 
+} );
+
+
+
+var box;
+function add_mesh_box(object_options){
+	box = new THREE.Mesh(object_options.geometry,basic_material);
+	box.position.y = 5;
+	box.scale.set(1,10,1);
+	box.options = {
+    type : gui.__folders['Mesh Options'].__controllers[0].object.type,
+    material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
+    href : gui.__folders['Mesh Options'].__controllers[2].object.href,
+    description : gui.__folders['Mesh Options'].__controllers[3].object.description
+  };
+	var edges = new THREE.EdgesHelper( box, 0x000000 );
+	    edges.material.linewidth = 1;
+	    scene.add( edges );
+	box.type = 'box';
+	objects.push(box);
+	scene.add(box);
+}
+
 //////////////////////////////////////////
     //    Plane
 //////////////////////////////////////////
@@ -130,9 +179,9 @@ function onDocumentMouseMove( event ) {
     SELECTED.position.y = 0;
 
     move_Handler(SELECTED);
-    gui_value.x = scene_options.active.position.x;
-    gui_value.z = scene_options.active.position.z;
-    gui_value.rot = scene_options.active.rotation.y;
+    gui_value.x = SELECTED.position.x;
+    gui_value.z = SELECTED.position.z;
+    gui_value.rot = SELECTED.rotation.y;
     return;
   }
 
@@ -220,52 +269,12 @@ function onDocumentMouseUp( event ) {
   document.body.style.cursor = 'auto';
 }
 
-var meshMaterial = new THREE.MeshLambertMaterial({
-	specular: 0xff0000, 
-	color: 0x444444, 
-	shininess: 0, 
-	metal: true
-});
-
-var basic_material = new THREE.MeshBasicMaterial( { 
-	color: 0xffffff, 
-	opacity:1,
-	shininess: 0,
-	transparent: false 
-} );
-
-var active_material = new THREE.MeshLambertMaterial( { 
-	color: 0xff0000, 
-	opacity:1,
-	shininess: 0,
-	transparent: false 
-} );
-var basic_wire_material = new THREE.MeshBasicMaterial( { 
-	color: 0x000000,
-	wireframe: true, 
-	opacity:1,
-	shininess: 0,
-	transparent: false 
-} );
-
-
-
 var loader = new THREE.JSONLoader();
-var hirsch,box;
+
 function add_new_Object(object_options){
 
   if(object_options.type == 'box'){
-    //object_options.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 5, 0 ) );
-        box = new THREE.Mesh(object_options.geometry,basic_material);
-        box.position.y = 5;
-        box.scale.set(1,10,1);
-        box.options = object_options;
-        var edges = new THREE.EdgesHelper( box, 0x000000 );
-            edges.material.linewidth = 5;
-            scene.add( edges );
-        box.type = 'box';
-        objects.push(box);
-        scene.add(box);
+    add_mesh_box(object_options);   
   }
   if(object_options.type == 'schrank'){
     object_options.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 5, 0 ) );
@@ -313,19 +322,23 @@ function onContextMenu(e){
 }
 
 var guiOptions = function() {
-  this.message = 'text';
+
+  this.clickable = true;
+  this.lineWidth = 1;
   this.scene = scene;
+
+
+  ///////////////////////////////////////////////////////// 
+  //// Mesh OPTIONs
+  /////////////////////////////////////////////////////////
   this.x = 50;
   this.z = 50;
   this.rot = 0;
-  this.scale = 1;
   this.displayOutline = false;
-  this.href = 'http://www.google.de/';
-  this.description = 'Dieser Gegenstand hat eine Beschreibung';
+  this.href = 'link';
+  this.description = 'Beschreibungstext';
   this.type = 'schrank';
-  //this.position
-  this.clickable = true;
-  this.geometry = '';//new THREE.BoxGeometry(10,10,10);
+
   this.Material = 'MeshLambertMaterial';
 
   this.add = function(){
@@ -345,25 +358,33 @@ var gui = new dat.GUI();
 var gui_value = new guiOptions();
 
 var scene_GUI = gui.addFolder('Scene Options');
-var options_clickable = scene_GUI.add(gui_value, 'clickable');
-var options_scale = scene_GUI.add(gui_value, 'scale',0,10).step(1);
-    scene_GUI.open();
+    scene_GUI.add(gui_value, 'clickable');
+    scene_GUI.add(gui_value,'export');
+    scene_GUI.add(gui_value, 'lineWidth',1,10).listen();
+    for (var i in scene_GUI.__controllers) {
+      scene_GUI.__controllers[i].onChange(function(value) {
+        if(this.property == 'lineWidth'){
 
-
+          grundriss_wire_holder.children.forEach(function(el){
+            el.material.linewidth = value;
+          });
+          edges.material.linewidth = value;
+        }
+      });
+    }
+ 
 
 var mesh_GUI = gui.addFolder('Mesh Options');
+    mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
+    mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
     mesh_GUI.add(gui_value, 'x',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'z',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'rot',0,360).step(45).listen();
-    mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
-    mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
     mesh_GUI.add(gui_value, 'href').listen();
     mesh_GUI.add(gui_value, 'description').listen();
 
     // Add Button
     mesh_GUI.add(gui_value,'add');
-    mesh_GUI.add(gui_value,'export');
-
 
     for (var i in mesh_GUI.__controllers) {
       mesh_GUI.__controllers[i].onChange(function(value) {
@@ -388,26 +409,11 @@ var mesh_GUI = gui.addFolder('Mesh Options');
         }
       });
     }
-
-
-    
-
     mesh_GUI.open();
+
 $('.close-button').click(function(){
   $('.dg.ac').toggleClass('active');
 });
-/*
-
-message.onChange(function(value) {
-  console.log(value);
-  // Fires on every change, drag, keypress, etc.
-});
-
-message.onFinishChange(function(value) {
-  // Fires when a controller loses focus.
- console.log(value);
-});
-*/
 
 $('.dg.ac').bind({
   mouseenter : function(){
@@ -443,7 +449,7 @@ var options = {
   curveSegments: 0,
   steps: 1
 };
-
+var edges;
 function drawShape(el) {
     var shape = transformSVGPathExposed(el.attr("d"));
     return shape;
@@ -453,19 +459,22 @@ function createMesh(geom) {
     geom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0));
     // create a multimaterial
     var mesh = new THREE.Mesh(geom,basic_material);
-    var edges = new THREE.EdgesHelper( mesh, 0x000000 );
-    edges.material.linewidth = 5;
-    scene.add( edges );
+    edges = new THREE.EdgesHelper( mesh, 0x000000 );
+    edges.material.linewidth = gui.__folders['Scene Options'].__controllers[0].object.lineWidth;
+    grundriss_wire_holder.add( edges );
     mesh.rotation.z = 90 * Math.PI/180;
     return [mesh];
 }
 
 var grundriss_holder = new THREE.Object3D();
+var grundriss_wire_holder = new THREE.Object3D();
 $(".st0").each(function(){
   shape = createMesh(new THREE.ExtrudeGeometry(drawShape($(this)), options));
   // add it to the scene.
   grundriss_holder.add(shape[0]);
+
 });
+  
   grundriss_holder.scale.set(2,2,50);
   grundriss_holder.rotation.x = 90*Math.PI/180;
   grundriss_holder.position.y = 100;
@@ -473,7 +482,7 @@ $(".st0").each(function(){
   grundriss_holder.position.z = -600;
   grundriss_holder.enableShadow = true;
   grundriss_holder.castShadow = true;
-scene.add(grundriss_holder);
+scene.add(grundriss_holder,grundriss_wire_holder);
 
 /*var grid = {
   x : 50,
@@ -514,7 +523,7 @@ var floor = new THREE.Mesh( geometry, basic_material );
 scene.add( floor );
 
 
-var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
+var geometry = new THREE.PlaneGeometry( 900,800, 32 );
 var material = new THREE.MeshBasicMaterial( {
   color: 0xcccccc, 
   side: THREE.DoubleSide, 

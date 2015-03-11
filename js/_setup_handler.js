@@ -40,9 +40,9 @@ function onDocumentMouseMove( event ) {
     SELECTED.position.y = 0;
 
     move_Handler(SELECTED);
-    gui_value.x = scene_options.active.position.x;
-    gui_value.z = scene_options.active.position.z;
-    gui_value.rot = scene_options.active.rotation.y;
+    gui_value.x = SELECTED.position.x;
+    gui_value.z = SELECTED.position.z;
+    gui_value.rot = SELECTED.rotation.y;
     return;
   }
 
