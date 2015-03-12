@@ -1,6 +1,7 @@
 var guiOptions = function() {
 
   this.clickable = true;
+  this.camera = 'Orbit';
   this.lineWidth = 1;
   this.scene = scene;
 
@@ -35,11 +36,20 @@ var gui = new dat.GUI();
 var gui_value = new guiOptions();
 
 var scene_GUI = gui.addFolder('Scene Options');
+    scene_GUI.add(gui_value, 'camera',[ 'Orbit', 'First Person']).listen();
     scene_GUI.add(gui_value, 'clickable');
     scene_GUI.add(gui_value,'export');
     scene_GUI.add(gui_value, 'lineWidth',1,10).listen();
     for (var i in scene_GUI.__controllers) {
       scene_GUI.__controllers[i].onChange(function(value) {
+        if(this.property == 'camera'){
+          if(value == 'Orbit'){
+
+          }
+          else if(value == 'First Person'){
+            
+          }
+        }
         if(this.property == 'lineWidth'){
 
           grundriss_wire_holder.children.forEach(function(el){
@@ -49,7 +59,7 @@ var scene_GUI = gui.addFolder('Scene Options');
         }
       });
     }
- 
+  scene_GUI.open();
 
 var mesh_GUI = gui.addFolder('Mesh Options');
     mesh_GUI.add(gui_value, 'type', [ 'Schrank', 'Box','Info', 'Arbeitsplatz' ]).listen();
@@ -75,6 +85,7 @@ var mesh_GUI = gui.addFolder('Mesh Options');
           if(this.property == 'rot'){
             scene_options.active.rotation.y = value * Math.PI/180;
           }
+
         }
       });
 
