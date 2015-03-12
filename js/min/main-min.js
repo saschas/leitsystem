@@ -13,13 +13,6 @@ INTERSECTED, SELECTED;
 ///////////////////////////////////////
 var object_options = {
   type : 'schrank',
-  position : {
-    vec : null,
-    x:null,
-    y:null,
-    z:null
-  },
-  clickable : true,
   active_material : new THREE.MeshBasicMaterial({color:0x00ff00}),
   geometry: new THREE.BoxGeometry(10,10,10),
   extra : {
@@ -29,11 +22,21 @@ var object_options = {
 }
 
 
-camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 1, 10000 );
-camera.position.set(0,3500,5000);
+camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
+camera.position.set(0,10,1000);
+
+
+
 ////////////////////////////////////////
   //    Controls
 ////////////////////////////////////////
+//controls = new THREE.FirstPersonControls( camera);
+//controls.movementSpeed = 70;
+//controls.lookSpeed = 0.05;
+//controls.enabled = true;
+//controls.movementSpeed = 1.0;
+//controls.lookSpeed = 0.005;
+
 controls = new THREE.OrbitControls( camera );
 controls.rotateSpeed = 1.0;
 controls.zoomSpeed = 1.2;
@@ -42,6 +45,8 @@ controls.noZoom = false;
 controls.noPan = false;
 controls.staticMoving = true;
 controls.dynamicDampingFactor = 0.3;
+
+//
 scene = new THREE.Scene();
 scene.add( new THREE.AmbientLight( 0x505050 ) );
 
@@ -324,6 +329,7 @@ function onContextMenu(e){
 var guiOptions = function() {
 
   this.clickable = true;
+  this.camera = 'Orbit';
   this.lineWidth = 1;
   this.scene = scene;
 
@@ -358,11 +364,20 @@ var gui = new dat.GUI();
 var gui_value = new guiOptions();
 
 var scene_GUI = gui.addFolder('Scene Options');
+    scene_GUI.add(gui_value, 'camera',[ 'Orbit', 'First Person']).listen();
     scene_GUI.add(gui_value, 'clickable');
     scene_GUI.add(gui_value,'export');
     scene_GUI.add(gui_value, 'lineWidth',1,10).listen();
     for (var i in scene_GUI.__controllers) {
       scene_GUI.__controllers[i].onChange(function(value) {
+        if(this.property == 'camera'){
+          if(value == 'Orbit'){
+
+          }
+          else if(value == 'First Person'){
+            
+          }
+        }
         if(this.property == 'lineWidth'){
 
           grundriss_wire_holder.children.forEach(function(el){
@@ -372,7 +387,7 @@ var scene_GUI = gui.addFolder('Scene Options');
         }
       });
     }
- 
+  scene_GUI.open();
 
 var mesh_GUI = gui.addFolder('Mesh Options');
     mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
@@ -398,6 +413,7 @@ var mesh_GUI = gui.addFolder('Mesh Options');
           if(this.property == 'rot'){
             scene_options.active.rotation.y = value * Math.PI/180;
           }
+
         }
       });
 
@@ -523,18 +539,21 @@ var floor = new THREE.Mesh( geometry, basic_material );
 scene.add( floor );
 
 
-var geometry = new THREE.PlaneGeometry( 900,800, 32 );
-var material = new THREE.MeshBasicMaterial( {
-  color: 0xcccccc, 
-  side: THREE.DoubleSide, 
-  map : THREE.ImageUtils.loadTexture(
-        "raumplan.png"
-)});
+var geometry = new THREE.PlaneGeometry( 760,760, 32 );
+var material = new THREE.MeshLambertMaterial( {
+  color: 0x222222, 
+  side: THREE.DoubleSide,
+  shineness: .01,
+  specular: .1
+  //map : THREE.ImageUtils.loadTexture("raumplan.png")
+	
+	}
+);
 
 var floor = new THREE.Mesh( geometry, material );
   floor.rotation.x = 90 * Math.PI/180;
-floor.position.x = -100;
-floor.position.y = 0;
+floor.position.x = -15;
+floor.position.z = 15;
 floor.scale.set(1.5,1.5,1.5);
 floor.enableShadow = true;
 floor.castShadow = true;

@@ -13,13 +13,6 @@ INTERSECTED, SELECTED;
 ///////////////////////////////////////
 var object_options = {
   type : 'schrank',
-  position : {
-    vec : null,
-    x:null,
-    y:null,
-    z:null
-  },
-  clickable : true,
   active_material : new THREE.MeshBasicMaterial({color:0x00ff00}),
   geometry: new THREE.BoxGeometry(10,10,10),
   extra : {
