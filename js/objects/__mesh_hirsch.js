@@ -10,6 +10,7 @@ function add_mesh_hirsch(object_options){
           hirsch = new THREE.Mesh( geometry, basic_material );
           hirsch.scale.set(20,20,20);
           hirsch.position.set(0,0,0);
+          //make it movable
           objects.push(hirsch);
           hirsch.options = {
             type : gui.__folders['Mesh Options'].__controllers[0].object.type,
@@ -18,7 +19,7 @@ function add_mesh_hirsch(object_options){
             description : gui.__folders['Mesh Options'].__controllers[3].object.description
           };
       var edges = new THREE.EdgesHelper( hirsch, 0x000000 );
-          edges.material.linewidth = 5;
+          edges.material.linewidth = 2;
           scene.add( edges );
       scene.add( hirsch );
     }

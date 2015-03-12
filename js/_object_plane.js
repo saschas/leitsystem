@@ -1,4 +1,4 @@
-var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
+/*var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
 
 var floor = new THREE.Mesh( geometry, basic_material );
 		floor.rotation.x = 90 * Math.PI/180;
@@ -6,3 +6,5 @@ var floor = new THREE.Mesh( geometry, basic_material );
 		floor.enableShadow = true;
 		floor.castShadow = true;
 scene.add( floor );
+
+*/

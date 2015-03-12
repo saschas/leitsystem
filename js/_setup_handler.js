@@ -86,20 +86,29 @@ function onDocumentMouseDown( event ) {
     var intersects = raycaster.intersectObject( plane );
     offset.copy( intersects[ 0 ].point ).sub( plane.position );
     
-    down_Handler(SELECTED);
-    
+    //wenn noch nichts ausgewählt ist
     if(!scene_options.active){
       scene_options.active = SELECTED;
-    }    
-    else if(JSON.stringify(scene_options.active) === JSON.stringify( SELECTED)){
-      scene_options.active.material = basic_material;
-      scene_options.active = null;
-    }
-    else if(JSON.stringify(scene_options.active) != JSON.stringify( SELECTED)){
-      scene_options.active.material = basic_material;
-      scene_options.active = SELECTED;
+      scene_options.materialbackup = SELECTED.material;
+      SELECTED.material = active_material;
     }
 
+    //wenn auf ein neues Objekt ausgewählt wird = activiert
+    else if(JSON.stringify(scene_options.active) != JSON.stringify( SELECTED)){
+      console.log('nichst ausgewählt gewesen',scene_options.materialbackup);
+      scene_options.active.material = basic_material;
+      scene_options.active = SELECTED;
+      SELECTED.material = active_material;
+    }
+
+    //wenn auf ein ausgewähltes Object geklickt wird == deactiviert
+    else if(JSON.stringify(scene_options.active) === JSON.stringify( SELECTED)){
+      
+      scene_options.active.material = scene_options.materialbackup;
+      scene_options.active = null;
+    }
+
+    //waehrend etwas ausgewaehlt ist
     if(scene_options.active){
       console.log(gui_value.x);
       gui_value.x = scene_options.active.position.x;
@@ -109,6 +118,14 @@ function onDocumentMouseDown( event ) {
       gui_value.href = scene_options.active.options.href;
       gui_value.description = scene_options.active.options.description;
       document.body.style.cursor = 'move';
+    }
+    down_Handler(SELECTED);
+    //
+  }
+  else{
+    if(scene_options.active){
+      scene_options.active.material = scene_options.materialbackup;
+      scene_options.active = null;
     }
   }
 }

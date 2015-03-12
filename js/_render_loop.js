@@ -10,5 +10,8 @@ function animate() {
 
 function render() {
   controls.update();
+  if(info_schild){
+  	info_schild.lookAt(camera.position);
+  }
   renderer.render( scene, camera );
 }

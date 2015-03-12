@@ -14,7 +14,7 @@ var guiOptions = function() {
   this.displayOutline = false;
   this.href = 'link';
   this.description = 'Beschreibungstext';
-  this.type = 'schrank';
+  this.type = 'Schrank';
 
   this.Material = 'MeshLambertMaterial';
 
@@ -52,7 +52,7 @@ var scene_GUI = gui.addFolder('Scene Options');
  
 
 var mesh_GUI = gui.addFolder('Mesh Options');
-    mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
+    mesh_GUI.add(gui_value, 'type', [ 'Schrank', 'Box','Info', 'Arbeitsplatz' ]).listen();
     mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
     mesh_GUI.add(gui_value, 'x',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'z',-window.innerWidth,window.innerWidth).listen();

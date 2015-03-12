@@ -137,6 +137,67 @@ function add_mesh_box(object_options){
 	scene.add(box);
 }
 
+function add_mesh_hirsch(object_options){
+  object_options.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 5, 0 ) );
+
+  // load hirsch
+  loader.load(
+    // resource URL
+    "model/hirsch.js",
+    // Function when resource is loaded
+    function ( geometry) {
+          hirsch = new THREE.Mesh( geometry, basic_material );
+          hirsch.scale.set(20,20,20);
+          hirsch.position.set(0,0,0);
+          //make it movable
+          objects.push(hirsch);
+          hirsch.options = {
+            type : gui.__folders['Mesh Options'].__controllers[0].object.type,
+            material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
+            href : gui.__folders['Mesh Options'].__controllers[2].object.href,
+            description : gui.__folders['Mesh Options'].__controllers[3].object.description
+          };
+      var edges = new THREE.EdgesHelper( hirsch, 0x000000 );
+          edges.material.linewidth = 2;
+          scene.add( edges );
+      scene.add( hirsch );
+    }
+  );
+}
+
+var info_schild;
+function add_mesh_info(){
+	var geometry = new THREE.PlaneGeometry( 35,35, 32 );
+	var material = new THREE.MeshBasicMaterial( {
+	  color: 0xffffff, 
+	  side: THREE.DoubleSide,
+	  transparent: true,
+	  alpha:0,
+	  map : THREE.ImageUtils.loadTexture(
+	        "raumplan/info_schild.png"
+	)});
+
+		info_schild = new THREE.Mesh( geometry, material );
+	  info_schild.rotation.x = 90 * Math.PI/180;
+		info_schild.lookAt(camera.position);
+		info_schild.scale.set(1.5,1.5,1.5);
+		info_schild.enableShadow = true;
+		info_schild.castShadow = true;
+
+		info_schild.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 15, 0 ) );
+
+		//make it moveable
+		objects.push(info_schild);
+
+		info_schild.options = {
+            type : gui.__folders['Mesh Options'].__controllers[0].object.type,
+            material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
+            href : gui.__folders['Mesh Options'].__controllers[2].object.href,
+            description : gui.__folders['Mesh Options'].__controllers[3].object.description
+          };
+		scene.add( info_schild );
+}
+
 //////////////////////////////////////////
     //    Plane
 //////////////////////////////////////////
@@ -225,20 +286,29 @@ function onDocumentMouseDown( event ) {
     var intersects = raycaster.intersectObject( plane );
     offset.copy( intersects[ 0 ].point ).sub( plane.position );
     
-    down_Handler(SELECTED);
-    
+    //wenn noch nichts ausgewählt ist
     if(!scene_options.active){
       scene_options.active = SELECTED;
-    }    
-    else if(JSON.stringify(scene_options.active) === JSON.stringify( SELECTED)){
-      scene_options.active.material = basic_material;
-      scene_options.active = null;
-    }
-    else if(JSON.stringify(scene_options.active) != JSON.stringify( SELECTED)){
-      scene_options.active.material = basic_material;
-      scene_options.active = SELECTED;
+      scene_options.materialbackup = SELECTED.material;
+      SELECTED.material = active_material;
     }
 
+    //wenn auf ein neues Objekt ausgewählt wird = activiert
+    else if(JSON.stringify(scene_options.active) != JSON.stringify( SELECTED)){
+      console.log('nichst ausgewählt gewesen',scene_options.materialbackup);
+      scene_options.active.material = basic_material;
+      scene_options.active = SELECTED;
+      SELECTED.material = active_material;
+    }
+
+    //wenn auf ein ausgewähltes Object geklickt wird == deactiviert
+    else if(JSON.stringify(scene_options.active) === JSON.stringify( SELECTED)){
+      
+      scene_options.active.material = scene_options.materialbackup;
+      scene_options.active = null;
+    }
+
+    //waehrend etwas ausgewaehlt ist
     if(scene_options.active){
       console.log(gui_value.x);
       gui_value.x = scene_options.active.position.x;
@@ -248,6 +318,14 @@ function onDocumentMouseDown( event ) {
       gui_value.href = scene_options.active.options.href;
       gui_value.description = scene_options.active.options.description;
       document.body.style.cursor = 'move';
+    }
+    down_Handler(SELECTED);
+    //
+  }
+  else{
+    if(scene_options.active){
+      scene_options.active.material = scene_options.materialbackup;
+      scene_options.active = null;
     }
   }
 }
@@ -273,40 +351,22 @@ var loader = new THREE.JSONLoader();
 
 function add_new_Object(object_options){
 
-  if(object_options.type == 'box'){
+  if(object_options.type == 'Box'){
     add_mesh_box(object_options);   
   }
-  if(object_options.type == 'schrank'){
-    object_options.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 5, 0 ) );
-    
-    // load hirsch
-    loader.load(
-      // resource URL
-      "model/hirsch.js",
-      // Function when resource is loaded
-      function ( geometry) {
-            hirsch = new THREE.Mesh( geometry, basic_material );
-            hirsch.scale.set(20,20,20);
-            hirsch.position.set(0,0,0);
-            objects.push(hirsch);
-            hirsch.options = {
-              type : gui.__folders['Mesh Options'].__controllers[0].object.type,
-              material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
-              href : gui.__folders['Mesh Options'].__controllers[2].object.href,
-              description : gui.__folders['Mesh Options'].__controllers[3].object.description
-            };
-        var edges = new THREE.EdgesHelper( hirsch, 0x000000 );
-            edges.material.linewidth = 5;
-            scene.add( edges );
-        scene.add( hirsch );
-      }
-    );
+  if(object_options.type == 'Schrank'){
+    add_mesh_hirsch(object_options); 
+  }
+  if(object_options.type == 'Info'){
+
+    console.log('Info');
+    add_mesh_info(object_options); 
   }
 }
 
 
 function down_Handler(SELECTED){
-	SELECTED.material = active_material;
+	
 //  updateGUI(gui,SELECTED);
 }
 function up_Handler(SELECTED){
@@ -337,7 +397,7 @@ var guiOptions = function() {
   this.displayOutline = false;
   this.href = 'link';
   this.description = 'Beschreibungstext';
-  this.type = 'schrank';
+  this.type = 'Schrank';
 
   this.Material = 'MeshLambertMaterial';
 
@@ -375,7 +435,7 @@ var scene_GUI = gui.addFolder('Scene Options');
  
 
 var mesh_GUI = gui.addFolder('Mesh Options');
-    mesh_GUI.add(gui_value, 'type', [ 'schrank', 'box', 'arbeitsplatz' ]).listen();
+    mesh_GUI.add(gui_value, 'type', [ 'Schrank', 'Box','Info', 'Arbeitsplatz' ]).listen();
     mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
     mesh_GUI.add(gui_value, 'x',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'z',-window.innerWidth,window.innerWidth).listen();
@@ -513,7 +573,7 @@ for ( var j = 0; j < grid.y; j ++ ) {
   }
 }*/
 
-var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
+/*var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
 
 var floor = new THREE.Mesh( geometry, basic_material );
 		floor.rotation.x = 90 * Math.PI/180;
@@ -521,6 +581,8 @@ var floor = new THREE.Mesh( geometry, basic_material );
 		floor.enableShadow = true;
 		floor.castShadow = true;
 scene.add( floor );
+
+*/
 
 
 var geometry = new THREE.PlaneGeometry( 900,800, 32 );
@@ -540,6 +602,40 @@ floor.enableShadow = true;
 floor.castShadow = true;
 scene.add( floor );
 
+var numPoints = 50;
+
+var line_material = new THREE.LineBasicMaterial({
+	color: 0x002C60,
+	linewidth: 5,
+	linecap:'round',
+	linejoin: 'round'
+});
+/*
+var line_material = new THREE.LineDashedMaterial({
+	color: 0x002C60,
+	linewidth : 5,
+	scale:5,
+	dashSize:10,
+	gapSize:10
+});
+*/
+var spline = new THREE.SplineCurve3([
+	new THREE.Vector3(  0, 5, 10),
+	new THREE.Vector3(  0, 5, 100),
+	new THREE.Vector3(150, 5, 110),
+	new THREE.Vector3(150, 5, 10),
+	new THREE.Vector3(250, 5, 10),
+	new THREE.Vector3(250, 5, 110)]);
+var geometry = new THREE.Geometry();
+var splinePoints = spline.getPoints(numPoints);
+
+for (var i = 0; i < splinePoints.length; i++) {
+	geometry.vertices.push(splinePoints[i]);
+}
+
+var line = new THREE.Line(geometry, line_material);
+scene.add(line);
+
 //////////////////////////////////////////
     //    Render Loop
 //////////////////////////////////////////
@@ -552,6 +648,9 @@ function animate() {
 
 function render() {
   controls.update();
+  if(info_schild){
+  	info_schild.lookAt(camera.position);
+  }
   renderer.render( scene, camera );
 }
 
