@@ -1,3 +1,9 @@
+var objects = [], plane;
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2(),
+offset = new THREE.Vector3(),
+INTERSECTED, SELECTED;
 //////////////////////////////////////////
     //    Plane
 //////////////////////////////////////////
@@ -13,6 +19,10 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
+  if(gui_value.camera == 'Orthographic'){
+    ortho_Controls();
+  }
+
   renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
@@ -22,6 +32,7 @@ function onWindowResize() {
 function onDocumentMouseMove( event ) {
 
   event.preventDefault();
+
 
   ///////////////////////////////////////
   ////  Update Mouse Object
@@ -33,16 +44,25 @@ function onDocumentMouseMove( event ) {
 
   // Wenn ausgewaehlt
   if ( SELECTED ) {
+    if(SELECTED.parent  && SELECTED.parent.type === 'Object3D'){
+      var options =SELECTED.options; 
+      SELECTED = SELECTED.parent;
+      SELECTED.options = options;
+    }
+    if(gui_value.clickable == true){
+      var intersects = raycaster.intersectObject( plane );
+      SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
+      //prevent object from fly
+      SELECTED.position.y = 0;
+      gui_value.x = SELECTED.position.x;
+      gui_value.z = SELECTED.position.z;
+      gui_value.rot = SELECTED.rotation.y;
+    }
+    else{
 
-    var intersects = raycaster.intersectObject( plane );
-    SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
-    //prevent object from fly
-    SELECTED.position.y = 0;
-
-    move_Handler(SELECTED);
-    gui_value.x = SELECTED.position.x;
-    gui_value.z = SELECTED.position.z;
-    gui_value.rot = SELECTED.rotation.y;
+      move_Handler(SELECTED);
+    
+    }
     return;
   }
 
@@ -70,16 +90,20 @@ function onDocumentMouseMove( event ) {
 //////////////////////////////////////////
     //    Down
 //////////////////////////////////////////
+
+var intersects;
 function onDocumentMouseDown( event ) {
 
   event.preventDefault();
-
+  controls.enabled = true;
   var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
   var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
   var intersects = raycaster.intersectObjects( objects );
 
+  
   if ( intersects.length > 0 ) {
 
+    // Prevent Drag Look
     controls.enabled = false;
 
     SELECTED = intersects[ 0 ].object;
@@ -134,12 +158,18 @@ function onDocumentMouseDown( event ) {
     //    Up Setup
 //////////////////////////////////////////
 function onDocumentMouseUp( event ) {
-  
-  event.preventDefault();
-  controls.enabled = true;
-  if ( INTERSECTED ) {
-    plane.position.copy( INTERSECTED.position );
     
+  event.preventDefault();
+  
+
+  if(gui_value.camera == 'First Person'){
+    // Enable Controls while mousedown
+    controls.enabled = false;
+  }
+  
+
+  if ( INTERSECTED ) {
+    plane.position.copy( INTERSECTED.position );    
     up_Handler(SELECTED);
   
   }

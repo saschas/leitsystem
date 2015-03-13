@@ -16,12 +16,12 @@ var line_material = new THREE.LineDashedMaterial({
 });
 */
 var spline = new THREE.SplineCurve3([
-	new THREE.Vector3(  0, 5, 10),
-	new THREE.Vector3(  0, 5, 100),
-	new THREE.Vector3(150, 5, 110),
-	new THREE.Vector3(150, 5, 10),
-	new THREE.Vector3(250, 5, 10),
-	new THREE.Vector3(250, 5, 110)]);
+	new THREE.Vector3(  0, 80, 10),
+	new THREE.Vector3(  0, 80, 100),
+	new THREE.Vector3(150, 80, 110),
+	new THREE.Vector3(150, 80, 10),
+	new THREE.Vector3(250, 80, 10),
+	new THREE.Vector3(250, 80, 110)]);
 var geometry = new THREE.Geometry();
 var splinePoints = spline.getPoints(numPoints);
 

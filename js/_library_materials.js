@@ -12,6 +12,13 @@ var basic_material = new THREE.MeshBasicMaterial( {
 	transparent: false 
 } );
 
+var basic_wall_material = new THREE.MeshBasicMaterial( { 
+	color: 0xD0E2F0, 
+	opacity:.8,
+	transparent:true,
+	shininess: 0
+} );
+
 var active_material = new THREE.MeshLambertMaterial( { 
 	color: 0xff0000, 
 	opacity:1,

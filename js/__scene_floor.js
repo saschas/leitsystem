@@ -11,10 +11,10 @@ var material = new THREE.MeshLambertMaterial( {
 );
 
 var floor = new THREE.Mesh( geometry, material );
-  floor.rotation.x = 90 * Math.PI/180;
-floor.position.x = -15;
-floor.position.z = 15;
-floor.scale.set(1.5,1.5,1.5);
-floor.enableShadow = true;
-floor.castShadow = true;
-scene.add( floor );
+  	floor.rotation.x = 90 * Math.PI/180;
+		floor.position.x = -15;
+		floor.position.z = 15;
+		floor.scale.set(1.5,1.5,1.5);
+		floor.enableShadow = true;
+		floor.castShadow = true;
+		scene.add( floor );

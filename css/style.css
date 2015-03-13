@@ -67,3 +67,40 @@ canvas {
   box-shadow: 0 0 2em 0 rgba(0, 0, 0, 0.4); }
   .object-menu.open {
     display: block; }
+
+.hue-field {
+  position: absolute; }
+
+div#search_panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 9;
+  width: 150px;
+  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2); }
+
+div#search_panel a {
+  display: block;
+  line-height: 25px;
+  padding-left: 1em;
+  margin-bottom: .25em;
+  background: #ccc;
+  text-decoration: none;
+  color: #222;
+  font-family: 'Lato',sans-serif;
+  font-size: 12px; }
+  div#search_panel a:hover {
+    color: #eee;
+    background: #666; }
+
+.themen {
+  height: 60%;
+  position: absolute;
+  width: 100%;
+  overflow: scroll;
+  bottom: 0;
+  padding: 0.6em;
+  box-shadow: inset 0 0 .25em 0 #000;
+  background: #999; }

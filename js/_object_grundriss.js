@@ -20,7 +20,8 @@ function drawShape(el) {
 function createMesh(geom) {
     geom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0));
     // create a multimaterial
-    var mesh = new THREE.Mesh(geom,basic_material);
+    var mesh = new THREE.Mesh(geom,basic_wall_material);
+    basic_wall_material.depthWrite = false;
     edges = new THREE.EdgesHelper( mesh, 0x000000 );
     edges.material.linewidth = gui.__folders['Scene Options'].__controllers[0].object.lineWidth;
     grundriss_wire_holder.add( edges );
@@ -37,11 +38,12 @@ $(".st0").each(function(){
 
 });
   
-  grundriss_holder.scale.set(2,2,50);
+  grundriss_holder.scale.set(2,2,100);
   grundriss_holder.rotation.x = 90*Math.PI/180;
-  grundriss_holder.position.y = 100;
+  grundriss_holder.position.y = 200;
   grundriss_holder.position.x = 600;
   grundriss_holder.position.z = -600;
   grundriss_holder.enableShadow = true;
   grundriss_holder.castShadow = true;
+
 scene.add(grundriss_holder,grundriss_wire_holder);

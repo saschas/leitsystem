@@ -9,7 +9,14 @@ function animate() {
 }
 
 function render() {
-  controls.update();
+  //
+  if(gui_value.camera == 'Orbit' || gui_value.camera == 'Orthographic'){
+  	controls.update();
+  }
+  else if(gui_value.camera == 'First Person'){
+  	updateControls();
+  }
+
   if(info_schild){
   	info_schild.lookAt(camera.position);
   }

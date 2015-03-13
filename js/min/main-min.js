@@ -1,11 +1,6 @@
 var container, stats;
 var camera, controls, scene, renderer;
-var objects = [], plane;
 
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2(),
-offset = new THREE.Vector3(),
-INTERSECTED, SELECTED;
 
 
 ///////////////////////////////////////
@@ -21,32 +16,19 @@ var object_options = {
   }
 }
 
+function add_Options(el,optional_edges){
 
-camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
-camera.position.set(0,10,1000);
+  el.options = {
+      bestand : gui.__folders['Mesh Options'].__controllers[0].object.bestand,
+      type : gui.__folders['Mesh Options'].__controllers[1].object.type,
+      href : gui.__folders['Mesh Options'].__controllers[3].object.href,
+      description : gui.__folders['Mesh Options'].__controllers[4].object.description
+  };
+  if(optional_edges){
+  	el.options.edges = optional_edges;
+  }
+}
 
-
-
-////////////////////////////////////////
-  //    Controls
-////////////////////////////////////////
-//controls = new THREE.FirstPersonControls( camera);
-//controls.movementSpeed = 70;
-//controls.lookSpeed = 0.05;
-//controls.enabled = true;
-//controls.movementSpeed = 1.0;
-//controls.lookSpeed = 0.005;
-
-controls = new THREE.OrbitControls( camera );
-controls.rotateSpeed = 1.0;
-controls.zoomSpeed = 1.2;
-controls.panSpeed = 0.8;
-controls.noZoom = false;
-controls.noPan = false;
-controls.staticMoving = true;
-controls.dynamicDampingFactor = 0.3;
-
-//
 scene = new THREE.Scene();
 scene.add( new THREE.AmbientLight( 0x505050 ) );
 
@@ -54,22 +36,6 @@ scene.add( new THREE.AmbientLight( 0x505050 ) );
 var scene_options = {
   
 }
-
-var light = new THREE.SpotLight( 0xffffff, 1.5 );
-    light.position.set( 0, 1000, 0 );
-    light.castShadow = true;
-
-    light.shadowCameraNear = 50;
-    light.shadowCameraFar = camera.far;
-    light.shadowCameraFov = 50;
-    
-    light.shadowBias = -0.00022;
-    light.shadowDarkness = 0.5;
-    
-    light.shadowMapWidth = 2048;
-    light.shadowMapHeight = 2048;
-
-    scene.add( light );
 
 renderer = new THREE.WebGLRenderer( { antialias: true } );
 renderer.setClearColor( 0xf0f0f0 );
@@ -93,6 +59,243 @@ renderer.domElement.addEventListener("contextmenu", onContextMenu);
 
 window.addEventListener( 'resize', onWindowResize, false );
 
+camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 ); //.toPerspective();
+	
+
+/*new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 );*/
+camera.position.set(0,60,0);
+
+////////////////////////////////////////
+  //    Controls
+////////////////////////////////////////
+
+
+function orbit_Controls(){
+	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 ); //.toPerspective();
+	controls = new THREE.OrbitControls( camera );
+	controls.rotateSpeed = 1.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	camera.lookAt(new THREE.Vector3(0,0,0));
+	camera.position.set(0,1000,0);
+	camera.rotation.z = Math.sin(camera.rotation.y)/3.5;
+}
+
+function ortho_Controls(){
+	camera = new THREE.OrthographicCamera( -window.innerWidth * gui_value.distance ,window.innerWidth *  gui_value.distance, -window.innerWidth * gui_value.distance , window.innerWidth * gui_value.distance, 1, 100000 );
+	camera.position.x = 0;
+	camera.position.y = 2000;
+	camera.position.z = 0;
+	
+	controls = new THREE.TrackballControls( camera );
+	controls.rotateSpeed = 0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 10;
+
+	controls.noZoom = false;
+	controls.noPan = false;
+
+	controls.staticMoving = false;
+	controls.dynamicDampingFactor = 1;
+	camera.updateProjectionMatrix();
+
+	//controls.addEventListener( 'change', render );
+	/*
+	camera.lookAt(new THREE.Vector3(0,0,0));
+	camera.position.set(0,0,1000);
+	camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10000 );
+	camera.updateProjectionMatrix();
+	controls.enabled = true;
+	//camera.rotation.z = Math.sin(camera.rotation.y)/3.5;
+	*/
+}
+
+var controlsEnabled = true;
+	var moveForward = false;
+	var moveBackward = false;
+	var moveLeft = false;
+	var moveRight = false;
+	var canJump = true;
+
+	var prevTime = performance.now();
+	var velocity = new THREE.Vector3();
+
+
+function first_Controls(){
+	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 ); //.toPerspective();
+	camera.position.y = 80;
+	controlsEnabled = true;
+	moveForward = false;
+	moveBackward = false;
+	moveLeft = false;
+	moveRight = false;
+	canJump = true;
+
+	prevTime = performance.now();
+	velocity = new THREE.Vector3();
+	controls = new THREE.PointerLockControls( camera );
+	scene.add( controls.getObject() );
+
+	var onKeyDown = function ( event ) {
+
+			switch ( event.keyCode ) {
+
+				case 38: // up
+				case 87: // w
+					moveForward = true;
+					break;
+
+				case 37: // left
+				case 65: // a
+					moveLeft = true; 
+					break;
+
+				case 40: // down
+				case 83: // s
+					moveBackward = true;
+					break;
+
+				case 39: // right
+				case 68: // d
+					moveRight = true;
+					break;
+
+				case 32: // space
+					if ( canJump === true ) velocity.y += 350;
+					//canJump = false;
+					break;
+
+			}
+
+		};
+
+		var onKeyUp = function ( event ) {
+
+			switch( event.keyCode ) {
+
+				case 38: // up
+				case 87: // w
+					moveForward = false;
+					break;
+
+				case 37: // left
+				case 65: // a
+					moveLeft = false;
+					break;
+
+				case 40: // down
+				case 83: // s
+					moveBackward = false;
+					break;
+
+				case 39: // right
+				case 68: // d
+					moveRight = false;
+					break;
+
+			}
+
+		};
+
+		document.addEventListener( 'keydown', onKeyDown, false );
+		document.addEventListener( 'keyup', onKeyUp, false );
+}
+
+orbit_Controls();
+
+function updateControls(){
+
+		if(scene_options.mousedown){
+			raycaster.ray.origin.copy( controls.getObject().position );
+			raycaster.ray.origin.y -= 10;
+
+			var intersections = raycaster.intersectObjects( objects );
+
+			var isOnObject = intersections.length > 0;
+		}
+		var time = performance.now();
+		var delta = ( time - prevTime ) / 1000;
+
+		velocity.x -= velocity.x * 10.0 * delta;
+		velocity.z -= velocity.z * 10.0 * delta;
+
+		velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+		if ( moveForward ) velocity.z -= gui_value.movementSpeed * delta;
+		if ( moveBackward ) velocity.z += gui_value.movementSpeed * delta;
+
+		if ( moveLeft ) velocity.x -= gui_value.movementSpeed * delta;
+		if ( moveRight ) velocity.x += gui_value.movementSpeed * delta;
+
+		if ( isOnObject === true ) {
+			velocity.y = Math.max( 0, velocity.y );
+
+			canJump = true;
+		}
+
+		controls.getObject().translateX( velocity.x * delta );
+		controls.getObject().translateY( velocity.y * delta );
+		controls.getObject().translateZ( velocity.z * delta );
+
+		if ( controls.getObject().position.y < 10 ) {
+
+			velocity.y = 0;
+			controls.getObject().position.y = 10;
+		}
+
+		prevTime = time;
+
+}
+
+var light = new THREE.SpotLight( 0xffffff, 1.5 );
+    light.position.set( 0, 1000, 0 );
+    light.castShadow = true;
+
+    light.shadowCameraNear = 50;
+    light.shadowCameraFar = camera.far;
+    light.shadowCameraFov = 50;
+    
+    light.shadowBias = -0.00022;
+    light.shadowDarkness = 0.5;
+    
+    light.shadowMapWidth = 2048;
+    light.shadowMapHeight = 2048;
+
+    scene.add( light );
+
+
+
+var hemi = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+    hemi.position.set( 0.5, 1, 0.75 );
+    scene.add( hemi );
+
+
+
+
+var geometry = new THREE.PlaneGeometry( 760,760, 32 );
+var material = new THREE.MeshLambertMaterial( {
+  color: 0x222222, 
+  side: THREE.DoubleSide,
+  shineness: .01,
+  specular: .1
+  //map : THREE.ImageUtils.loadTexture("raumplan.png")
+	
+	}
+);
+
+var floor = new THREE.Mesh( geometry, material );
+  	floor.rotation.x = 90 * Math.PI/180;
+		floor.position.x = -15;
+		floor.position.z = 15;
+		floor.scale.set(1.5,1.5,1.5);
+		floor.enableShadow = true;
+		floor.castShadow = true;
+		scene.add( floor );
+
 var meshMaterial = new THREE.MeshLambertMaterial({
 	specular: 0xff0000, 
 	color: 0x444444, 
@@ -105,6 +308,13 @@ var basic_material = new THREE.MeshBasicMaterial( {
 	opacity:1,
 	shininess: 0,
 	transparent: false 
+} );
+
+var basic_wall_material = new THREE.MeshBasicMaterial( { 
+	color: 0xD0E2F0, 
+	opacity:.8,
+	transparent:true,
+	shininess: 0
 } );
 
 var active_material = new THREE.MeshLambertMaterial( { 
@@ -125,24 +335,48 @@ var basic_wire_material = new THREE.MeshBasicMaterial( {
 
 var box;
 function add_mesh_box(object_options){
+	object_options.geometry = new THREE.BoxGeometry(60,100,30);
 	box = new THREE.Mesh(object_options.geometry,basic_material);
-	box.position.y = 5;
-	box.scale.set(1,10,1);
-	box.options = {
-    type : gui.__folders['Mesh Options'].__controllers[0].object.type,
-    material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
-    href : gui.__folders['Mesh Options'].__controllers[2].object.href,
-    description : gui.__folders['Mesh Options'].__controllers[3].object.description
-  };
+	//box.scale.set(10,10,3);
+	box.applyMatrix(new THREE.Matrix4().makeTranslation(0,100, 0));
 	var edges = new THREE.EdgesHelper( box, 0x000000 );
 	    edges.material.linewidth = 1;
 	    scene.add( edges );
-	box.type = 'box';
+	add_Options(box,edges);
 	objects.push(box);
 	scene.add(box);
 }
 
+var grid,gridHolder;
+function add_mesh_grid(object_options){
+
+	gridHolder = new THREE.Object3D();
+
+	for(var j=0;j<gui_value.grid_y;j++){
+		for(var i=0;i<gui_value.grid_x;i++){
+			grid = new THREE.Mesh(object_options.geometry,basic_material);
+			grid.position.x = i * 11;
+			grid.position.z = j * 11;
+			grid.scale.set(1,10,1);
+			
+			var edges = new THREE.EdgesHelper( grid, 0x000000 );
+			    edges.material.linewidth = 1;
+			    scene.add( edges );
+
+			add_Options(grid);
+			objects.push(grid);
+
+			gridHolder.add(grid);
+		}
+	}
+	gridHolder.applyMatrix(new THREE.Matrix4().makeTranslation(0,50, 0));
+	scene.add(gridHolder);
+}
+
+
 function add_mesh_hirsch(object_options){
+
+
   object_options.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 5, 0 ) );
 
   // load hirsch
@@ -151,27 +385,27 @@ function add_mesh_hirsch(object_options){
     "model/hirsch.js",
     // Function when resource is loaded
     function ( geometry) {
-          hirsch = new THREE.Mesh( geometry, basic_material );
+      hirsch = new THREE.Mesh( geometry, basic_material );
           hirsch.scale.set(20,20,20);
           hirsch.position.set(0,0,0);
           //make it movable
           objects.push(hirsch);
-          hirsch.options = {
-            type : gui.__folders['Mesh Options'].__controllers[0].object.type,
-            material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
-            href : gui.__folders['Mesh Options'].__controllers[2].object.href,
-            description : gui.__folders['Mesh Options'].__controllers[3].object.description
-          };
+          
       var edges = new THREE.EdgesHelper( hirsch, 0x000000 );
           edges.material.linewidth = 2;
           scene.add( edges );
+          add_Options(hirsch,edges);
       scene.add( hirsch );
     }
   );
 }
 
 var info_schild;
+var service_holder;
 function add_mesh_info(){
+	if(service_holder ==undefined){
+		service_holder = new THREE.Object3D();
+	}
 	var geometry = new THREE.PlaneGeometry( 35,35, 32 );
 	var material = new THREE.MeshBasicMaterial( {
 	  color: 0xffffff, 
@@ -184,25 +418,31 @@ function add_mesh_info(){
 
 		info_schild = new THREE.Mesh( geometry, material );
 	  info_schild.rotation.x = 90 * Math.PI/180;
+	  info_schild.position.y = 50;
 		info_schild.lookAt(camera.position);
 		info_schild.scale.set(1.5,1.5,1.5);
 		info_schild.enableShadow = true;
 		info_schild.castShadow = true;
 
-		info_schild.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 15, 0 ) );
+		
 
+		add_Options(info_schild);
 		//make it moveable
 		objects.push(info_schild);
 
-		info_schild.options = {
-            type : gui.__folders['Mesh Options'].__controllers[0].object.type,
-            material : gui.__folders['Mesh Options'].__controllers[1].object.Material,
-            href : gui.__folders['Mesh Options'].__controllers[2].object.href,
-            description : gui.__folders['Mesh Options'].__controllers[3].object.description
-          };
-		scene.add( info_schild );
+		
+		info_schild.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
+
+		service_holder.add( info_schild );
+		scene.add(service_holder);
 }
 
+var objects = [], plane;
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2(),
+offset = new THREE.Vector3(),
+INTERSECTED, SELECTED;
 //////////////////////////////////////////
     //    Plane
 //////////////////////////////////////////
@@ -218,6 +458,10 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
+  if(gui_value.camera == 'Orthographic'){
+    ortho_Controls();
+  }
+
   renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
@@ -227,6 +471,7 @@ function onWindowResize() {
 function onDocumentMouseMove( event ) {
 
   event.preventDefault();
+
 
   ///////////////////////////////////////
   ////  Update Mouse Object
@@ -238,16 +483,25 @@ function onDocumentMouseMove( event ) {
 
   // Wenn ausgewaehlt
   if ( SELECTED ) {
+    if(SELECTED.parent  && SELECTED.parent.type === 'Object3D'){
+      var options =SELECTED.options; 
+      SELECTED = SELECTED.parent;
+      SELECTED.options = options;
+    }
+    if(gui_value.clickable == true){
+      var intersects = raycaster.intersectObject( plane );
+      SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
+      //prevent object from fly
+      SELECTED.position.y = 0;
+      gui_value.x = SELECTED.position.x;
+      gui_value.z = SELECTED.position.z;
+      gui_value.rot = SELECTED.rotation.y;
+    }
+    else{
 
-    var intersects = raycaster.intersectObject( plane );
-    SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
-    //prevent object from fly
-    SELECTED.position.y = 0;
-
-    move_Handler(SELECTED);
-    gui_value.x = SELECTED.position.x;
-    gui_value.z = SELECTED.position.z;
-    gui_value.rot = SELECTED.rotation.y;
+      move_Handler(SELECTED);
+    
+    }
     return;
   }
 
@@ -275,16 +529,20 @@ function onDocumentMouseMove( event ) {
 //////////////////////////////////////////
     //    Down
 //////////////////////////////////////////
+
+var intersects;
 function onDocumentMouseDown( event ) {
 
   event.preventDefault();
-
+  controls.enabled = true;
   var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
   var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
   var intersects = raycaster.intersectObjects( objects );
 
+  
   if ( intersects.length > 0 ) {
 
+    // Prevent Drag Look
     controls.enabled = false;
 
     SELECTED = intersects[ 0 ].object;
@@ -339,12 +597,18 @@ function onDocumentMouseDown( event ) {
     //    Up Setup
 //////////////////////////////////////////
 function onDocumentMouseUp( event ) {
-  
-  event.preventDefault();
-  controls.enabled = true;
-  if ( INTERSECTED ) {
-    plane.position.copy( INTERSECTED.position );
     
+  event.preventDefault();
+  
+
+  if(gui_value.camera == 'First Person'){
+    // Enable Controls while mousedown
+    controls.enabled = false;
+  }
+  
+
+  if ( INTERSECTED ) {
+    plane.position.copy( INTERSECTED.position );    
     up_Handler(SELECTED);
   
   }
@@ -352,91 +616,112 @@ function onDocumentMouseUp( event ) {
   document.body.style.cursor = 'auto';
 }
 
-var loader = new THREE.JSONLoader();
-
-function add_new_Object(object_options){
-
-  if(object_options.type == 'Box'){
-    add_mesh_box(object_options);   
-  }
-  if(object_options.type == 'Schrank'){
-    add_mesh_hirsch(object_options); 
-  }
-  if(object_options.type == 'Info'){
-
-    console.log('Info');
-    add_mesh_info(object_options); 
-  }
-}
-
-
-function down_Handler(SELECTED){
-	
-//  updateGUI(gui,SELECTED);
-}
-function up_Handler(SELECTED){
-
-}
-function move_Handler(SELECTED){
-
-}
-
-function onContextMenu(e){
-  eX = e.pageX;
-  eY = e.pageY;
-}
+///////////////////////////////////////////////////////// 
+//// GUI Presets
+/////////////////////////////////////////////////////////
 
 var guiOptions = function() {
 
+  ////////////////////////
+  /// Scene Options
+  ////////////////////////
+
   this.clickable = true;
-  this.camera = 'Orbit';
   this.lineWidth = 1;
-  this.scene = scene;
+  this.bg_color = '#cccccc';
 
-
-  ///////////////////////////////////////////////////////// 
-  //// Mesh OPTIONs
-  /////////////////////////////////////////////////////////
-  this.x = 50;
-  this.z = 50;
-  this.rot = 0;
-  this.displayOutline = false;
-  this.href = 'link';
-  this.description = 'Beschreibungstext';
-  this.type = 'Schrank';
-
-  this.Material = 'MeshLambertMaterial';
-
-  this.add = function(){
-    object_options.type = gui_value.type;
-    object_options.controls = gui_value;
-    add_new_Object(object_options);
-  }
   this.export = function () {
       var exporter = new THREE.SceneExporter();
       var sceneJson = exporter.parse(this.scene);
      // console.log(sceneJson);
       //localStorage.setItem('scene', sceneJson);
   };
+
+  ////////////////////////
+  /// Camera Options
+  ////////////////////////
+  this.camera = 'Orbit';
+  this.distance = 1;  
+  this.perspective = 75;
+  this.movementSpeed = 1200;
+  
+  this.scene = scene;
+
+
+  ////////////////////////// 
+  //// Mesh OPTIONs
+  //////////////////////////
+  this.x = 50;
+  this.z = 50;
+  this.rot = 0;
+
+  this.grid_x = 2;
+  this.grid_y = 2;
+
+  this.displayOutline = false;
+
+  this.bestand = 'Allgemeines';
+  this.href = 'link';
+  this.description = 'Beschreibungstext';
+  this.type = 'Schrank';
+  
+
+  this.add = function(){
+    object_options.type = gui_value.type;
+    object_options.controls = gui_value;
+    add_new_Object(object_options);
+  }
+  this.delete = function(){
+    if(scene_options.active){
+      var counter = -1;
+      objects.forEach(function(el){
+        counter++;
+        if(el.uuid == scene_options.active.uuid ){
+          console.log(el);
+          if(scene_options.active.parent.type != 'Scene'){
+            scene.remove(scene_options.active.parent);
+          }
+          else{
+            scene.remove(scene_options.active);
+          }
+
+          if(scene_options.active.options.edges){
+            scene.remove(scene_options.active.options.edges);
+          }
+          console.log(objects.splice(counter, 1));
+        }
+      })
+      //scene.remove(scene_options.active);
+      
+    }
+    console.log()
+  }
 };
 
+///////////////////////////////////////////////////////// 
+//// GUI
+/////////////////////////////////////////////////////////
 var gui = new dat.GUI();
 var gui_value = new guiOptions();
 
+
+//////////////////////
+//// Scene Folder
+//////////////////////
 var scene_GUI = gui.addFolder('Scene Options');
-    scene_GUI.add(gui_value, 'camera',[ 'Orbit', 'First Person']).listen();
+    scene_GUI.addColor(gui_value,'bg_color');    
+    scene_GUI.add(gui_value, 'lineWidth',1,10).step(1).listen();
     scene_GUI.add(gui_value, 'clickable');
     scene_GUI.add(gui_value,'export');
-    scene_GUI.add(gui_value, 'lineWidth',1,10).listen();
+//////////////////////
+//// Scene Actions
+//////////////////////   
     for (var i in scene_GUI.__controllers) {
       scene_GUI.__controllers[i].onChange(function(value) {
-        if(this.property == 'camera'){
-          if(value == 'Orbit'){
-
-          }
-          else if(value == 'First Person'){
-            
-          }
+        
+        if(this.property == 'bg_color'){
+          var color = new THREE.Color(value);
+          renderer.setClearColor( color );
         }
         if(this.property == 'lineWidth'){
 
@@ -449,31 +734,96 @@ var scene_GUI = gui.addFolder('Scene Options');
     }
   scene_GUI.open();
 
+//////////////////////
+//// Camera Folder
+//////////////////////
+
+var camera_GUI = gui.addFolder('Camera Options');
+    camera_GUI.add(gui_value, 'camera',[ 'Orbit','Orthographic', 'First Person']).listen();
+    camera_GUI.add(gui_value, 'perspective',1,160).listen();
+    camera_GUI.add(gui_value, 'movementSpeed',0,2000).step(20).listen();
+    camera_GUI.add(gui_value, 'distance',0.2,2).step(.1).listen();
+
+//////////////////////
+//// Scene Actions
+//////////////////////
+    for (var i in camera_GUI.__controllers) {
+      camera_GUI.__controllers[i].onChange(function(value) {
+        
+        switch(this.property){
+          case 'distance':
+            camera.left = -window.innerWidth * value;
+            camera.right = window.innerWidth * value;
+            camera.top = -window.innerWidth * value;
+            camera.bottom = window.innerWidth * value;
+            camera.updateProjectionMatrix();
+          break;
+        }
+        if(this.property == 'perspective'){
+            camera.fov = value;
+            camera.updateProjectionMatrix();
+          }
+        console.log(this.property);
+        if(this.property == 'camera'){
+
+          if(value == 'Orbit'){
+            controls.enabled = false;
+            orbit_Controls();
+          }
+          else if(value == 'First Person'){
+            camera.position.set(0,80,0);
+            first_Controls();
+          }
+          else if(value == 'Orthographic'){
+            ortho_Controls();
+          }
+        }
+      });
+    }
+
+
+//////////////////////
+//// Mesh Folder
+//////////////////////
 var mesh_GUI = gui.addFolder('Mesh Options');
-    mesh_GUI.add(gui_value, 'type', [ 'Schrank', 'Box','Info', 'Arbeitsplatz' ]).listen();
-    mesh_GUI.add(gui_value, 'Material', [ 'MeshBasicMaterial', 'MeshLambertMaterial', 'MeshPhongMaterial' ] ).listen();
+    mesh_GUI.add(gui_value, 'type', [ 'Schrank','Grid', 'Box','Info', 'Arbeitsplatz' ]).listen();
     mesh_GUI.add(gui_value, 'x',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'z',-window.innerWidth,window.innerWidth).listen();
     mesh_GUI.add(gui_value, 'rot',0,360).step(45).listen();
+    
+    mesh_GUI.add(gui_value,'grid_x',1,20).step(1).listen();
+    mesh_GUI.add(gui_value,'grid_y',1,20).step(1).listen();
+
+    mesh_GUI.add(gui_value,'bestand',["Allgemeines","Architektur","Bauingenieurwesen","Bildungswesen","Biologie","Chemie","Geographie","Geschichtswissen","Gestaltung","Informatik","Information","Kunstwissenschaft","Maschinenbau","Mathematik","Medizin","Naturwissenschaft","Pädagogik","Philosophie","Physik","Politologie","Psychologie","Rechtswissenschaft","Religionswissenschaft","Sozialpädagogik","Sozialwissenschaft","Sport, Freizeit","Sprache","Technik","Volkswirtschaft","Werkstoffkunde","Wissenschaftskunde","Zeitschriften"]).listen();
     mesh_GUI.add(gui_value, 'href').listen();
     mesh_GUI.add(gui_value, 'description').listen();
-
-    // Add Button
     mesh_GUI.add(gui_value,'add');
+    mesh_GUI.add(gui_value,'delete');
 
+//////////////////////
+//// Mesh Actions
+//////////////////////
     for (var i in mesh_GUI.__controllers) {
       mesh_GUI.__controllers[i].onChange(function(value) {
         if(scene_options.active){
-          if(this.property == 'x'){
-            scene_options.active.position.x = value;
-          }
-          if(this.property == 'z'){
-            scene_options.active.position.z = value;
-          }
-          if(this.property == 'rot'){
-            scene_options.active.rotation.y = value * Math.PI/180;
-          }
+          switch(this.property){
+            case 'x':
+              scene_options.active.position.x = value;
+            break;
 
+            case 'z':
+              scene_options.active.position.z = value;
+            break;
+
+            case 'rot':
+              if(scene_options.active.parent.type != 'Scene'){
+                scene_options.active.parent.rotation.y = value * Math.PI/180;
+              }
+              else{
+                scene_options.active.rotation.y = value * Math.PI/180;
+              }
+            break;
+          }
         }
       });
 
@@ -500,6 +850,67 @@ $('.dg.ac').bind({
     controls.enabled = false;
   }
 });
+
+var loader = new THREE.JSONLoader();
+
+function add_new_Object(object_options){
+
+  switch(object_options.type){
+    case 'Box':
+      add_mesh_box(object_options);
+    break;
+
+    case 'Schrank':
+      add_mesh_hirsch(object_options);
+    break;
+
+    case 'Info':
+      add_mesh_info(object_options); 
+    break;
+
+    case 'Grid':
+      add_mesh_grid(object_options); 
+    break;
+  }
+}
+
+
+function down_Handler(SELECTED){
+	
+//  updateGUI(gui,SELECTED);
+}
+function up_Handler(SELECTED){
+
+}
+function move_Handler(SELECTED){
+
+}
+
+function onContextMenu(e){
+  eX = e.pageX;
+  eY = e.pageY;
+}
+
+$('#search_panel a').each(function(){
+	$(this).attr('data-search',$(this).text());
+});
+$('#search_panel a').click(function(){
+	search($(this).attr('data-search'));
+});
+
+
+function search(needle){
+	objects.forEach(function(el){
+		var curr = el.options.bestand;
+		if(needle ==curr){
+			el.material = active_material;
+		}
+		else{
+			el.material = basic_material;
+		}
+		console.log();
+	});
+}
 
 
 
@@ -534,7 +945,8 @@ function drawShape(el) {
 function createMesh(geom) {
     geom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0));
     // create a multimaterial
-    var mesh = new THREE.Mesh(geom,basic_material);
+    var mesh = new THREE.Mesh(geom,basic_wall_material);
+    basic_wall_material.depthWrite = false;
     edges = new THREE.EdgesHelper( mesh, 0x000000 );
     edges.material.linewidth = gui.__folders['Scene Options'].__controllers[0].object.lineWidth;
     grundriss_wire_holder.add( edges );
@@ -551,13 +963,14 @@ $(".st0").each(function(){
 
 });
   
-  grundriss_holder.scale.set(2,2,50);
+  grundriss_holder.scale.set(2,2,100);
   grundriss_holder.rotation.x = 90*Math.PI/180;
-  grundriss_holder.position.y = 100;
+  grundriss_holder.position.y = 200;
   grundriss_holder.position.x = 600;
   grundriss_holder.position.z = -600;
   grundriss_holder.enableShadow = true;
   grundriss_holder.castShadow = true;
+
 scene.add(grundriss_holder,grundriss_wire_holder);
 
 /*var grid = {
@@ -600,27 +1013,6 @@ scene.add( floor );
 
 */
 
-
-var geometry = new THREE.PlaneGeometry( 760,760, 32 );
-var material = new THREE.MeshLambertMaterial( {
-  color: 0x222222, 
-  side: THREE.DoubleSide,
-  shineness: .01,
-  specular: .1
-  //map : THREE.ImageUtils.loadTexture("raumplan.png")
-	
-	}
-);
-
-var floor = new THREE.Mesh( geometry, material );
-  floor.rotation.x = 90 * Math.PI/180;
-floor.position.x = -15;
-floor.position.z = 15;
-floor.scale.set(1.5,1.5,1.5);
-floor.enableShadow = true;
-floor.castShadow = true;
-scene.add( floor );
-
 var numPoints = 50;
 
 var line_material = new THREE.LineBasicMaterial({
@@ -639,12 +1031,12 @@ var line_material = new THREE.LineDashedMaterial({
 });
 */
 var spline = new THREE.SplineCurve3([
-	new THREE.Vector3(  0, 5, 10),
-	new THREE.Vector3(  0, 5, 100),
-	new THREE.Vector3(150, 5, 110),
-	new THREE.Vector3(150, 5, 10),
-	new THREE.Vector3(250, 5, 10),
-	new THREE.Vector3(250, 5, 110)]);
+	new THREE.Vector3(  0, 80, 10),
+	new THREE.Vector3(  0, 80, 100),
+	new THREE.Vector3(150, 80, 110),
+	new THREE.Vector3(150, 80, 10),
+	new THREE.Vector3(250, 80, 10),
+	new THREE.Vector3(250, 80, 110)]);
 var geometry = new THREE.Geometry();
 var splinePoints = spline.getPoints(numPoints);
 
@@ -666,7 +1058,14 @@ function animate() {
 }
 
 function render() {
-  controls.update();
+  //
+  if(gui_value.camera == 'Orbit' || gui_value.camera == 'Orthographic'){
+  	controls.update();
+  }
+  else if(gui_value.camera == 'First Person'){
+  	updateControls();
+  }
+
   if(info_schild){
   	info_schild.lookAt(camera.position);
   }
