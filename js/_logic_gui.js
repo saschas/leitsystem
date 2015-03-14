@@ -12,9 +12,10 @@ var guiOptions = function() {
   this.lineWidth = 1;
   this.bg_color = '#cccccc';
 
-  this.export = function () {
-      var exporter = new THREE.SceneExporter();
-      var sceneJson = exporter.parse(this.scene);
+  this.exporter = function () {
+    export_scene(objects);
+    //  var exporter = new THREE.SceneExporter();
+    //  var sceneJson = exporter.parse(this.scene);
      // console.log(sceneJson);
       //localStorage.setItem('scene', sceneJson);
   };
@@ -76,7 +77,6 @@ var guiOptions = function() {
       //scene.remove(scene_options.active);
       
     }
-    console.log()
   }
 };
 
@@ -94,7 +94,7 @@ var scene_GUI = gui.addFolder('Scene Options');
     scene_GUI.addColor(gui_value,'bg_color');    
     scene_GUI.add(gui_value, 'lineWidth',1,10).step(1).listen();
     scene_GUI.add(gui_value, 'clickable');
-    scene_GUI.add(gui_value,'export');
+    scene_GUI.add(gui_value,'exporter');
 //////////////////////
 //// Scene Actions
 //////////////////////   

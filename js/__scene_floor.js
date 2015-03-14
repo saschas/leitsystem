@@ -10,7 +10,7 @@ var material = new THREE.MeshLambertMaterial( {
 	}
 );
 
-var floor = new THREE.Mesh( geometry, material );
+var floor = new THREE.Mesh( geometry, basic_material );
   	floor.rotation.x = 90 * Math.PI/180;
 		floor.position.x = -15;
 		floor.position.z = 15;

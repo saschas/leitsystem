@@ -11,6 +11,10 @@ var options = {
   curveSegments: 0,
   steps: 1
 };
+
+var grundriss_options = {
+  height : 50
+}
 var edges;
 function drawShape(el) {
     var shape = transformSVGPathExposed(el.attr("d"));
@@ -38,9 +42,9 @@ $(".st0").each(function(){
 
 });
   
-  grundriss_holder.scale.set(2,2,100);
+  grundriss_holder.scale.set(2,2,grundriss_options.height);
   grundriss_holder.rotation.x = 90*Math.PI/180;
-  grundriss_holder.position.y = 200;
+  grundriss_holder.position.y = grundriss_options.height*2 + 1;
   grundriss_holder.position.x = 600;
   grundriss_holder.position.z = -600;
   grundriss_holder.enableShadow = true;

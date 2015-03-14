@@ -1,5 +1,5 @@
 var container, stats;
-var camera, controls, scene, renderer;
+var camera, controls, scene, renderer,hirsch;
 
 
 
@@ -15,15 +15,95 @@ var object_options = {
     description : 'Dieser Gegenstand hat eine Beschreibung',
   }
 }
+function set_Positions(el,object_options){
+  el.position.x = (function(){
+    if(object_options.position){
+      return object_options.position.x;
+    }
+    else{
+      return 0;
+    }
+  })();
+  el.position.y = (function(){
+    if(object_options.position){
+      return object_options.position.y;
+  }
+    else{
+      return 0;
+    }
+  })();
+  el.position.z = (function(){
+    if(object_options.position){
+      return object_options.position.z;
+  }
+    else{
+      return 0;
+    }
+  })();
+  el.rotation.y = (function(){
+    
+    if(object_options.rot){
+      return object_options.rot * Math.PI/180;
+  }
+    else{
+      return 0;
+    }
+  })();
+}
+function add_Options(el,optional_edges,object_options){
 
-function add_Options(el,optional_edges){
-
-  el.options = {
-      bestand : gui.__folders['Mesh Options'].__controllers[0].object.bestand,
-      type : gui.__folders['Mesh Options'].__controllers[1].object.type,
-      href : gui.__folders['Mesh Options'].__controllers[3].object.href,
-      description : gui.__folders['Mesh Options'].__controllers[4].object.description
-  };
+    el.options = {
+      type : (function(){
+        if(object_options.bestand != undefined){
+          return object_options.type;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.type;
+        }
+      })(),
+      rot : (function(){
+        if(object_options.rot != undefined){
+          return object_options.rot;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.rot;
+        }
+      })(),
+      bestand : (function(){
+        if(object_options.bestand != undefined){
+          return object_options.bestand;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.bestand;
+        }
+      })(),
+      
+      href :  (function(){
+        if(object_options.bestand != undefined){
+          return object_options.href;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.href;
+        }
+      })(),
+      parent : (function(){
+        if(el.parent != false){
+          return false;
+        }
+        else{
+          console.log(el.parent)
+          return el.parent.uuid;
+        }
+      })(),
+      description : (function(){
+        if(object_options.bestand != undefined){
+          return object_options.description;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.description;
+        }
+      })()
+    };
   if(optional_edges){
   	el.options.edges = optional_edges;
   }

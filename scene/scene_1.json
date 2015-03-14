@@ -1,0 +1,105 @@
+[
+    {
+        "type": "Schrank",
+        "rot": {
+            "_x": 0,
+            "_y": 0,
+            "_z": 0,
+            "_order": "XYZ"
+        },
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    {
+        "type": "Schrank",
+        "rot": 0,
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": 22.876796811472467,
+            "y": 0,
+            "z": -186.82717883184046
+        }
+    },
+    {
+        "type": "Box",
+        "rot": 90,
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": -66.54829556004353,
+            "y": 0,
+            "z": 6.160557436324436
+        }
+    },
+    {
+        "type": "Box",
+        "rot": 1.5707963267948966,
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": -219.6430870536591,
+            "y": 0,
+            "z": -329.57389831430703
+        }
+    },
+    {
+        "type": "Box",
+        "rot": 0,
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": -220.13645170971938,
+            "y": 0,
+            "z": -298.2681109975748
+        }
+    },
+    {
+        "type": "Box",
+        "rot": 0,
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": -158.728161078006,
+            "y": 0,
+            "z": -328.3318015035412
+        }
+    },
+    {
+        "type": "Box",
+        "rot": 0,
+        "bestand": "Allgemeines",
+        "href": "link",
+        "parent": false,
+        "description": "Beschreibungstext",
+        "edges": null,
+        "position": {
+            "x": -157.52487719964296,
+            "y": 0,
+            "z": -297.2813811639016
+        }
+    }
+]

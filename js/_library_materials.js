@@ -9,14 +9,18 @@ var basic_material = new THREE.MeshBasicMaterial( {
 	color: 0xffffff, 
 	opacity:1,
 	shininess: 0,
-	transparent: false 
+	transparent: false
 } );
 
 var basic_wall_material = new THREE.MeshBasicMaterial( { 
 	color: 0xD0E2F0, 
-	opacity:.8,
+	opacity:.9,
 	transparent:true,
 	shininess: 0
+} );
+var floor_material = new THREE.MeshBasicMaterial( { 
+	color: 0x555555,
+	side: THREE.DoubleSide
 } );
 
 var active_material = new THREE.MeshLambertMaterial( { 

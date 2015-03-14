@@ -17,3 +17,12 @@ ContextMenu
 - Search
 - Path to search
 
+
+JSON Export
+bestand: "Allgemeines"
+description: "Beschreibungstext"
+edges: null
+href: "link"
+parent: false
+position: Object
+rot: Objecttype: "Schrank"

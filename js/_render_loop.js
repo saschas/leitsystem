@@ -17,8 +17,12 @@ function render() {
   	updateControls();
   }
 
-  if(info_schild){
-  	info_schild.lookAt(camera.position);
-  }
+  objects.forEach(function(el){
+    //console.log(el.options.type);
+    if(el.options.type ==="Info"){
+      el.lookAt(camera.position);
+    }
+  })
+
   renderer.render( scene, camera );
 }

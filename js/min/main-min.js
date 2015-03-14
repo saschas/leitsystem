@@ -1,5 +1,5 @@
 var container, stats;
-var camera, controls, scene, renderer;
+var camera, controls, scene, renderer,hirsch;
 
 
 
@@ -15,19 +15,140 @@ var object_options = {
     description : 'Dieser Gegenstand hat eine Beschreibung',
   }
 }
+function set_Positions(el,object_options){
+  el.position.x = (function(){
+    if(object_options.position){
+      return object_options.position.x;
+    }
+    else{
+      return 0;
+    }
+  })();
+  el.position.y = (function(){
+    if(object_options.position){
+      return object_options.position.y;
+  }
+    else{
+      return 0;
+    }
+  })();
+  el.position.z = (function(){
+    if(object_options.position){
+      return object_options.position.z;
+  }
+    else{
+      return 0;
+    }
+  })();
+  el.rotation.y = (function(){
+    
+    if(object_options.rot){
+      return object_options.rot * Math.PI/180;
+  }
+    else{
+      return 0;
+    }
+  })();
+}
+function add_Options(el,optional_edges,object_options){
 
-function add_Options(el,optional_edges){
-
-  el.options = {
-      bestand : gui.__folders['Mesh Options'].__controllers[0].object.bestand,
-      type : gui.__folders['Mesh Options'].__controllers[1].object.type,
-      href : gui.__folders['Mesh Options'].__controllers[3].object.href,
-      description : gui.__folders['Mesh Options'].__controllers[4].object.description
-  };
+    el.options = {
+      type : (function(){
+        if(object_options.bestand != undefined){
+          return object_options.type;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.type;
+        }
+      })(),
+      rot : (function(){
+        if(object_options.rot != undefined){
+          return object_options.rot;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.rot;
+        }
+      })(),
+      bestand : (function(){
+        if(object_options.bestand != undefined){
+          return object_options.bestand;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.bestand;
+        }
+      })(),
+      
+      href :  (function(){
+        if(object_options.bestand != undefined){
+          return object_options.href;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.href;
+        }
+      })(),
+      parent : (function(){
+        if(el.parent != false){
+          return false;
+        }
+        else{
+          console.log(el.parent)
+          return el.parent.uuid;
+        }
+      })(),
+      description : (function(){
+        if(object_options.bestand != undefined){
+          return object_options.description;
+        }
+        else{
+          return gui.__folders['Mesh Options'].__controllers[0].object.description;
+        }
+      })()
+    };
   if(optional_edges){
   	el.options.edges = optional_edges;
   }
 }
+
+var meshMaterial = new THREE.MeshLambertMaterial({
+	specular: 0xff0000, 
+	color: 0x444444, 
+	shininess: 0, 
+	metal: true
+});
+
+var basic_material = new THREE.MeshBasicMaterial( { 
+	color: 0xffffff, 
+	opacity:1,
+	shininess: 0,
+	transparent: false
+} );
+
+var basic_wall_material = new THREE.MeshBasicMaterial( { 
+	color: 0xD0E2F0, 
+	opacity:.9,
+	transparent:true,
+	shininess: 0
+} );
+var floor_material = new THREE.MeshBasicMaterial( { 
+	color: 0x555555,
+	side: THREE.DoubleSide
+} );
+
+var active_material = new THREE.MeshLambertMaterial( { 
+	color: 0xff0000, 
+	opacity:1,
+	shininess: 0,
+	transparent: false 
+} );
+var basic_wire_material = new THREE.MeshBasicMaterial( { 
+	color: 0x000000,
+	wireframe: true, 
+	opacity:1,
+	shininess: 0,
+	transparent: false 
+} );
+
+
 
 scene = new THREE.Scene();
 scene.add( new THREE.AmbientLight( 0x505050 ) );
@@ -38,7 +159,7 @@ var scene_options = {
 }
 
 renderer = new THREE.WebGLRenderer( { antialias: true } );
-renderer.setClearColor( 0xf0f0f0 );
+renderer.setClearColor( 0x1d385f );
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight);
 renderer.sortObjects = false;
@@ -277,108 +398,105 @@ var hemi = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
 
 
 var geometry = new THREE.PlaneGeometry( 760,760, 32 );
-var material = new THREE.MeshLambertMaterial( {
-  color: 0x222222, 
-  side: THREE.DoubleSide,
-  shineness: .01,
-  specular: .1
-  //map : THREE.ImageUtils.loadTexture("raumplan.png")
-	
-	}
-);
 
-var floor = new THREE.Mesh( geometry, material );
+
+var floor = new THREE.Mesh( geometry, floor_material );
   	floor.rotation.x = 90 * Math.PI/180;
 		floor.position.x = -15;
-		floor.position.z = 15;
+		floor.position.z = 10;
 		floor.scale.set(1.5,1.5,1.5);
 		floor.enableShadow = true;
 		floor.castShadow = true;
 		scene.add( floor );
-
-var meshMaterial = new THREE.MeshLambertMaterial({
-	specular: 0xff0000, 
-	color: 0x444444, 
-	shininess: 0, 
-	metal: true
-});
-
-var basic_material = new THREE.MeshBasicMaterial( { 
-	color: 0xffffff, 
-	opacity:1,
-	shininess: 0,
-	transparent: false 
-} );
-
-var basic_wall_material = new THREE.MeshBasicMaterial( { 
-	color: 0xD0E2F0, 
-	opacity:.8,
-	transparent:true,
-	shininess: 0
-} );
-
-var active_material = new THREE.MeshLambertMaterial( { 
-	color: 0xff0000, 
-	opacity:1,
-	shininess: 0,
-	transparent: false 
-} );
-var basic_wire_material = new THREE.MeshBasicMaterial( { 
-	color: 0x000000,
-	wireframe: true, 
-	opacity:1,
-	shininess: 0,
-	transparent: false 
-} );
-
-
 
 var box;
 function add_mesh_box(object_options){
 	object_options.geometry = new THREE.BoxGeometry(60,100,30);
 	box = new THREE.Mesh(object_options.geometry,basic_material);
 	//box.scale.set(10,10,3);
+	set_Positions(box,object_options);
 	box.applyMatrix(new THREE.Matrix4().makeTranslation(0,100, 0));
 	var edges = new THREE.EdgesHelper( box, 0x000000 );
 	    edges.material.linewidth = 1;
 	    scene.add( edges );
-	add_Options(box,edges);
+	add_Options(box,edges,object_options);
 	objects.push(box);
 	scene.add(box);
 }
 
-var grid,gridHolder;
+var gridHolder;
 function add_mesh_grid(object_options){
-
-	gridHolder = new THREE.Object3D();
-
-	for(var j=0;j<gui_value.grid_y;j++){
-		for(var i=0;i<gui_value.grid_x;i++){
-			grid = new THREE.Mesh(object_options.geometry,basic_material);
-			grid.position.x = i * 11;
-			grid.position.z = j * 11;
+	/*
+	if(this.holder == undefined){
+		this.holder = new THREE.Object3D();
+		this.added = false;
+	}
+	if(object_options.parent!=false){
+		var geometry = new THREE.BoxGeometry(10,100,10);
+		var grid = new THREE.Mesh(geometry,basic_material);
+			grid.position.x = object_options.position.x;
+			grid.position.z = object_options.position.z;
 			grid.scale.set(1,10,1);
 			
 			var edges = new THREE.EdgesHelper( grid, 0x000000 );
 			    edges.material.linewidth = 1;
 			    scene.add( edges );
 
-			add_Options(grid);
-			objects.push(grid);
+			
 
-			gridHolder.add(grid);
-		}
+			
+			
+			console.log(grid);
+			//console.log(this.holder);
+			this.holder.add(grid);
+			
+			objects.push(grid);
+			add_Options(grid,edges,object_options);
+
+			this.holder.position.x = object_options.parent_position.x;
+			this.holder.position.y = object_options.parent_position.y;
+			this.holder.position.z = object_options.parent_position.z;
+			if(this.holder===undefined && !this.added){
+				scene.add(this.holder);
+				this.added = true;
+			}
+		
+		this.last_parent = object_options.parent;
 	}
-	gridHolder.applyMatrix(new THREE.Matrix4().makeTranslation(0,50, 0));
-	scene.add(gridHolder);
+
+	
+	
+	else{
+		for(var j=0;j<gui_value.grid_y;j++){
+			for(var i=0;i<gui_value.grid_x;i++){
+				var grid = new THREE.Mesh(object_options.geometry,basic_material);
+				grid.position.x = i * 11;
+				grid.position.z = j * 11;
+				grid.scale.set(1,10,1);
+				
+				var edges = new THREE.EdgesHelper( grid, 0x000000 );
+				    edges.material.linewidth = 1;
+				    scene.add( edges );
+
+				
+				
+
+				this.holder.add(grid);
+				objects.push(grid);
+				add_Options(grid,edges,object_options);
+			}
+		}
+		this.holder.applyMatrix(new THREE.Matrix4().makeTranslation(0,50, 0));
+		scene.add(this.holder);
+	}
+
+	
+	*/
 }
 
 
+var loader = new THREE.JSONLoader();
 function add_mesh_hirsch(object_options){
-
-
-  object_options.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 5, 0 ) );
-
   // load hirsch
   loader.load(
     // resource URL
@@ -387,25 +505,28 @@ function add_mesh_hirsch(object_options){
     function ( geometry) {
       hirsch = new THREE.Mesh( geometry, basic_material );
           hirsch.scale.set(20,20,20);
-          hirsch.position.set(0,0,0);
-          //make it movable
-          objects.push(hirsch);
+          
+          set_Positions(hirsch,object_options);
+
+          
           
       var edges = new THREE.EdgesHelper( hirsch, 0x000000 );
           edges.material.linewidth = 2;
           scene.add( edges );
-          add_Options(hirsch,edges);
+          
+
+          //make it movable
+          objects.push(hirsch);
+           add_Options(hirsch,edges,object_options);
       scene.add( hirsch );
+
     }
   );
 }
 
-var info_schild;
-var service_holder;
-function add_mesh_info(){
-	if(service_holder ==undefined){
-		service_holder = new THREE.Object3D();
-	}
+
+function add_mesh_info(object_options){
+	
 	var geometry = new THREE.PlaneGeometry( 35,35, 32 );
 	var material = new THREE.MeshBasicMaterial( {
 	  color: 0xffffff, 
@@ -416,25 +537,16 @@ function add_mesh_info(){
 	        "raumplan/info_schild.png"
 	)});
 
-		info_schild = new THREE.Mesh( geometry, material );
-	  info_schild.rotation.x = 90 * Math.PI/180;
-	  info_schild.position.y = 50;
+		var info_schild = new THREE.Mesh( geometry, material );
+
+		set_Positions(info_schild,object_options);
 		info_schild.lookAt(camera.position);
 		info_schild.scale.set(1.5,1.5,1.5);
-		info_schild.enableShadow = true;
-		info_schild.castShadow = true;
+		info_schild.position.y = 50;
+		scene.add( info_schild );
 
-		
-
-		add_Options(info_schild);
-		//make it moveable
 		objects.push(info_schild);
-
-		
-		info_schild.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
-
-		service_holder.add( info_schild );
-		scene.add(service_holder);
+		add_Options(info_schild,false,object_options);
 }
 
 var objects = [], plane;
@@ -616,6 +728,126 @@ function onDocumentMouseUp( event ) {
   document.body.style.cursor = 'auto';
 }
 
+
+
+function add_new_Object(object_options){
+
+  switch(object_options.type){
+    case 'Box':
+      console.log('box_yep');
+      add_mesh_box(object_options);
+    break;
+
+    case 'Schrank':
+      console.log('schrank_yep');
+      add_mesh_hirsch(object_options);
+    break;
+
+    case 'Info':
+      console.log('info_yep');
+      add_mesh_info(object_options); 
+    break;
+
+    case 'Grid':
+      console.log('grid_yep',object_options);
+      add_mesh_grid(object_options); 
+    break;
+  }
+}
+
+
+function export_scene(objects){
+	var scene_export_array = [];
+	objects.forEach(function(el){
+		el.options.edges = null;
+		el.options.rot = el.options.rot;
+		el.options.parent = (function(){
+			if(el.parent.type != 'Scene'){
+				return el.parent.uuid;
+			}
+			else{
+				return false;
+			};
+		})();
+		el.options.position = (function(){
+			if(el.parent.type != 'Scene'){
+				el.options.parent_position = el.parent.position;
+			}
+			else{
+				
+			};
+			return el.position;
+		})();
+		scene_export_array.push(el.options);
+	});
+	(function(console){
+
+	    console.save = function(data, filename){
+
+	        if(!data) {
+	            console.error('Console.save: No data')
+	            return;
+	        }
+
+	        if(!filename) filename = 'console.json'
+
+	        if(typeof data === "object"){
+	            data = JSON.stringify(data, undefined, 4)
+	        }
+
+	        var blob = new Blob([data], {type: 'text/json'}),
+	            e    = document.createEvent('MouseEvents'),
+	            a    = document.createElement('a')
+
+	        a.download = filename
+	        a.href = window.URL.createObjectURL(blob)
+	        a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
+	        e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+	        a.dispatchEvent(e)
+	    }
+	})(console);
+
+	console.log(scene_export_array);
+	console.save(scene_export_array);
+}
+
+function down_Handler(SELECTED){
+	
+//  updateGUI(gui,SELECTED);
+}
+function up_Handler(SELECTED){
+
+}
+function move_Handler(SELECTED){
+
+}
+
+function onContextMenu(e){
+  eX = e.pageX;
+  eY = e.pageY;
+}
+
+$('#search_panel a').each(function(){
+	$(this).attr('data-search',$(this).text());
+});
+$('#search_panel a').click(function(){
+	search($(this).attr('data-search'));
+});
+
+
+function search(needle){
+	objects.forEach(function(el){
+		var curr = el.options.bestand;
+		if(needle ==curr){
+			el.material = active_material;
+		}
+		else{
+			el.material = basic_material;
+		}
+		console.log();
+	});
+}
+
 ///////////////////////////////////////////////////////// 
 //// GUI Presets
 /////////////////////////////////////////////////////////
@@ -630,9 +862,10 @@ var guiOptions = function() {
   this.lineWidth = 1;
   this.bg_color = '#cccccc';
 
-  this.export = function () {
-      var exporter = new THREE.SceneExporter();
-      var sceneJson = exporter.parse(this.scene);
+  this.exporter = function () {
+    export_scene(objects);
+    //  var exporter = new THREE.SceneExporter();
+    //  var sceneJson = exporter.parse(this.scene);
      // console.log(sceneJson);
       //localStorage.setItem('scene', sceneJson);
   };
@@ -694,7 +927,6 @@ var guiOptions = function() {
       //scene.remove(scene_options.active);
       
     }
-    console.log()
   }
 };
 
@@ -712,7 +944,7 @@ var scene_GUI = gui.addFolder('Scene Options');
     scene_GUI.addColor(gui_value,'bg_color');    
     scene_GUI.add(gui_value, 'lineWidth',1,10).step(1).listen();
     scene_GUI.add(gui_value, 'clickable');
-    scene_GUI.add(gui_value,'export');
+    scene_GUI.add(gui_value,'exporter');
 //////////////////////
 //// Scene Actions
 //////////////////////   
@@ -851,67 +1083,6 @@ $('.dg.ac').bind({
   }
 });
 
-var loader = new THREE.JSONLoader();
-
-function add_new_Object(object_options){
-
-  switch(object_options.type){
-    case 'Box':
-      add_mesh_box(object_options);
-    break;
-
-    case 'Schrank':
-      add_mesh_hirsch(object_options);
-    break;
-
-    case 'Info':
-      add_mesh_info(object_options); 
-    break;
-
-    case 'Grid':
-      add_mesh_grid(object_options); 
-    break;
-  }
-}
-
-
-function down_Handler(SELECTED){
-	
-//  updateGUI(gui,SELECTED);
-}
-function up_Handler(SELECTED){
-
-}
-function move_Handler(SELECTED){
-
-}
-
-function onContextMenu(e){
-  eX = e.pageX;
-  eY = e.pageY;
-}
-
-$('#search_panel a').each(function(){
-	$(this).attr('data-search',$(this).text());
-});
-$('#search_panel a').click(function(){
-	search($(this).attr('data-search'));
-});
-
-
-function search(needle){
-	objects.forEach(function(el){
-		var curr = el.options.bestand;
-		if(needle ==curr){
-			el.material = active_material;
-		}
-		else{
-			el.material = basic_material;
-		}
-		console.log();
-	});
-}
-
 
 
 ///////////////////////////////////////
@@ -936,6 +1107,10 @@ var options = {
   curveSegments: 0,
   steps: 1
 };
+
+var grundriss_options = {
+  height : 50
+}
 var edges;
 function drawShape(el) {
     var shape = transformSVGPathExposed(el.attr("d"));
@@ -963,9 +1138,9 @@ $(".st0").each(function(){
 
 });
   
-  grundriss_holder.scale.set(2,2,100);
+  grundriss_holder.scale.set(2,2,grundriss_options.height);
   grundriss_holder.rotation.x = 90*Math.PI/180;
-  grundriss_holder.position.y = 200;
+  grundriss_holder.position.y = grundriss_options.height*2 + 1;
   grundriss_holder.position.x = 600;
   grundriss_holder.position.z = -600;
   grundriss_holder.enableShadow = true;
@@ -1002,17 +1177,6 @@ for ( var j = 0; j < grid.y; j ++ ) {
   }
 }*/
 
-/*var geometry = new THREE.PlaneGeometry( window.innerWidth,window.innerHeight, 32 );
-
-var floor = new THREE.Mesh( geometry, basic_material );
-		floor.rotation.x = 90 * Math.PI/180;
-		floor.position.y = 1;
-		floor.enableShadow = true;
-		floor.castShadow = true;
-scene.add( floor );
-
-*/
-
 var numPoints = 50;
 
 var line_material = new THREE.LineBasicMaterial({
@@ -1047,6 +1211,19 @@ for (var i = 0; i < splinePoints.length; i++) {
 var line = new THREE.Line(geometry, line_material);
 scene.add(line);
 
+$.getJSON("scene/scene_1.json", function(json) {
+
+json.forEach(function(el){
+
+	add_new_Object(el);
+});
+
+console.log(objects);
+	
+	
+   // console.log(json);
+});
+
 //////////////////////////////////////////
     //    Render Loop
 //////////////////////////////////////////
@@ -1066,9 +1243,13 @@ function render() {
   	updateControls();
   }
 
-  if(info_schild){
-  	info_schild.lookAt(camera.position);
-  }
+  objects.forEach(function(el){
+    //console.log(el.options.type);
+    if(el.options.type ==="Info"){
+      el.lookAt(camera.position);
+    }
+  })
+
   renderer.render( scene, camera );
 }
 
